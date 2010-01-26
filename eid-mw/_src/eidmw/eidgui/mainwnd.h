@@ -353,7 +353,7 @@ private:
 	{
 		switch(certStatus)
 		{
-		case BEID_CERTIF_STATUS_OCSP_NOT_CHECKED:
+		case 0xFFFF:
 			strCertStatus = tr("OCSP not checked");
 			break;
 		case BEID_CERTIF_STATUS_REVOKED:

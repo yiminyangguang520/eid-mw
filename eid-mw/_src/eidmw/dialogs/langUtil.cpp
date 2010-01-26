@@ -139,7 +139,7 @@ std::wstring CLang::GetMessageFromID(DlgMessageID messageID)
 			wchar_t fullpath[PATH_LENGHT];
 			wcscpy_s(fullpath,PATH_LENGHT,L"");
 
-			const wchar_t *exename=NULL;
+			wchar_t *exename=NULL;
 
 			GetProcessName(fullpath,PATH_LENGHT);
 

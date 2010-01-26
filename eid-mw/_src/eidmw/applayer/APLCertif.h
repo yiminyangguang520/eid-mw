@@ -30,12 +30,11 @@
 #include "APLCard.h"
 #include "APLCardFile.h"
 #include "APLCrypto.h"
-#include <limits.h>
 
 namespace eIDMW
 {
 
-#define ANY_INDEX ULONG_MAX
+#define NO_INDEX 0xFFFFFFFF
 
 enum APL_CertifType
 {
@@ -177,7 +176,7 @@ public:
 	  *
 	  * If no certificate is found, we throw an exception
 	  */
-	EIDMW_APL_API APL_Certif *getCert(APL_CertifType type,unsigned long ulIndex=ANY_INDEX, bool bOnlyVisible=true);
+	EIDMW_APL_API APL_Certif *getCert(APL_CertifType type,unsigned long ulIndex=NO_INDEX, bool bOnlyVisible=true);
 
 	/**
 	  * Return the number of root certificates in the store
@@ -189,7 +188,7 @@ public:
 	  *
 	  * If no root is found, we throw an exception
 	  */
-	EIDMW_APL_API APL_Certif *getRoot(unsigned long ulIndex=ANY_INDEX, bool bOnlyVisible=true);
+	EIDMW_APL_API APL_Certif *getRoot(unsigned long ulIndex=NO_INDEX, bool bOnlyVisible=true);
 
 	/**
 	  * Return the number of authentication certificates in the store
@@ -201,7 +200,7 @@ public:
 	  *
 	  * If no authentication certificate is found, we throw an exception
 	  */
-	EIDMW_APL_API APL_Certif *getAuthentication(unsigned long ulIndex=ANY_INDEX, bool bOnlyVisible=true);
+	EIDMW_APL_API APL_Certif *getAuthentication(unsigned long ulIndex=NO_INDEX, bool bOnlyVisible=true);
 
 	/**
 	  * Return the number of signature certificates in the store
@@ -213,7 +212,7 @@ public:
 	  *
 	  * If no signature certificate is found, we throw an exception
 	  */
-	EIDMW_APL_API APL_Certif *getSignature(unsigned long ulIndex=ANY_INDEX, bool bOnlyVisible=true);
+	EIDMW_APL_API APL_Certif *getSignature(unsigned long ulIndex=NO_INDEX, bool bOnlyVisible=true);
 
 	/**
 	  * Return the number of CA certificates in the store
@@ -225,7 +224,7 @@ public:
 	  *
 	  * If no CA certificate is found, we throw an exception
 	  */
-	EIDMW_APL_API APL_Certif *getCA(unsigned long ulIndex=ANY_INDEX, bool bOnlyVisible=true);
+	EIDMW_APL_API APL_Certif *getCA(unsigned long ulIndex=NO_INDEX, bool bOnlyVisible=true);
 
 	/**
 	  * Return the first certificate from the card

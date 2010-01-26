@@ -28,7 +28,6 @@
 #include "APLCertif.h"
 
 #include <vector>
-#include <limits.h>
 
 //UNIQUE INDEX FOR RETRIEVING OBJECT
 #define	INCLUDE_OBJECT_CERTDATA		1
@@ -46,7 +45,6 @@
 #define	INCLUDE_OBJECT_FIRSTCERT	2000
 #define	INCLUDE_OBJECT_FIRSTCHILD	3000
 
-#define ANY_INDEX ULONG_MAX
 
 namespace eIDMW
 {
@@ -629,6 +627,8 @@ BEID_Certificate &BEID_Certificates::getCert(BEID_CertifType type)
 
 	unsigned long idxObject;
 	APL_CertifType aplType;
+
+	unsigned long index=-1;
 	bool bOnlyVisible=true;
 
 	switch(type)
@@ -667,7 +667,7 @@ BEID_Certificate &BEID_Certificates::getCert(BEID_CertifType type)
 		//proot=dynamic_cast<BEID_Certificate *>(getObject(idxObject));
 		//if(!proot)
 		//{
-			out = new BEID_Certificate(m_context,pimpl->getCert(aplType,ANY_INDEX,bOnlyVisible));
+			out = new BEID_Certificate(m_context,pimpl->getCert(aplType,index,bOnlyVisible));
 			if(out)
 				m_objects[idxObject]=out;
 			else

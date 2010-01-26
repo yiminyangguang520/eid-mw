@@ -48,6 +48,9 @@
         <property name="text" >
          <string>&amp;1</string>
         </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
         <property name="popupMode" >
          <enum>QToolButton::DelayedPopup</enum>
         </property>
@@ -61,12 +64,18 @@
         <property name="text" >
          <string>&amp;2</string>
         </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
        </widget>
       </item>
       <item row="1" column="2" >
        <widget class="QToolButton" name="tbtNUM_3" >
         <property name="text" >
          <string>&amp;3</string>
+        </property>
+        <property name="icon" >
+         <iconset/>
         </property>
        </widget>
       </item>
@@ -75,12 +84,18 @@
         <property name="text" >
          <string>&amp;4</string>
         </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
        </widget>
       </item>
       <item row="2" column="1" >
        <widget class="QToolButton" name="tbtNUM_5" >
         <property name="text" >
          <string>&amp;5</string>
+        </property>
+        <property name="icon" >
+         <iconset/>
         </property>
        </widget>
       </item>
@@ -89,12 +104,18 @@
         <property name="text" >
          <string>&amp;6</string>
         </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
        </widget>
       </item>
       <item row="3" column="0" >
        <widget class="QToolButton" name="tbtNUM_7" >
         <property name="text" >
          <string>&amp;7</string>
+        </property>
+        <property name="icon" >
+         <iconset/>
         </property>
        </widget>
       </item>
@@ -103,12 +124,18 @@
         <property name="text" >
          <string>&amp;8</string>
         </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
        </widget>
       </item>
       <item row="3" column="2" >
        <widget class="QToolButton" name="tbtNUM_9" >
         <property name="text" >
          <string>&amp;9</string>
+        </property>
+        <property name="icon" >
+         <iconset/>
         </property>
        </widget>
       </item>
@@ -117,12 +144,18 @@
         <property name="text" >
          <string>&amp;0</string>
         </property>
+        <property name="icon" >
+         <iconset/>
+        </property>
        </widget>
       </item>
       <item row="4" column="2" >
        <widget class="QToolButton" name="tbtClear" >
         <property name="text" >
          <string>C&amp;E</string>
+        </property>
+        <property name="icon" >
+         <iconset/>
         </property>
        </widget>
       </item>
@@ -135,6 +168,9 @@
       <widget class="QLabel" name="lblIcon" >
        <property name="text" >
         <string/>
+       </property>
+       <property name="pixmap" >
+        <pixmap/>
        </property>
       </widget>
      </item>
