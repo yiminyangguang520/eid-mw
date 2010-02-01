@@ -702,7 +702,7 @@ QByteArray getFileBytes (QString filename) {
 
 void saveByteArrayToFile(QByteArray ba, QString filename) {
     QFile outfile(filename);
-    if (outfile.open(QIODevice::WriteOnly) == TRUE);
+    if (outfile.open(QIODevice::WriteOnly) == TRUE)
 	{
 		QDataStream dsout(&outfile);
 		dsout.writeRawData(ba.data(),ba.length());
