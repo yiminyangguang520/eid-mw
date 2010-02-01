@@ -110,7 +110,7 @@ BEGIN
             VALUE "FileDescription", "eID-QuickInstaller"
             VALUE "FileVersion", "3, 0, 1, 6184"
             VALUE "InternalName", "eID-QuickInstaller"
-            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "LegalCopyright", "Copyright (C) 2009 - 2010"
             VALUE "OriginalFilename", "eID-QuickInstaller.exe"
             VALUE "ProductName", "Belgium eID MiddleWare"
             VALUE "ProductVersion", "3.0"
