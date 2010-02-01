@@ -789,7 +789,19 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\ArchiveFile.zrc"
+			>
+		</File>
+		<File
 			RelativePath=".\Resources\Back.png"
+			>
+		</File>
+		<File
+			RelativePath=".\BeidMinidriver.msi"
+			>
+		</File>
+		<File
+			RelativePath=".\BeidMW35.msi"
 			>
 		</File>
 		<File
@@ -816,6 +828,10 @@
 		</File>
 		<File
 			RelativePath=".\Resources\pngtest.png"
+			>
+		</File>
+		<File
+			RelativePath=".\Resources\Setup.ico"
 			>
 		</File>
 		<File

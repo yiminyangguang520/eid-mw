@@ -602,6 +602,8 @@ LOGSTR(paramsAsString.c_str())
         {extractISSFiles(QString(paramsAsString.c_str())); }
     else if (ElementName == QString("EXTRACTMIDDLEWARE")) 
         {extractMiddleWare(); }
+    else if (ElementName == QString("EXTRACTMINIDRIVER")) 
+        {extractMiniDriver(); }
 
 #ifdef WIN32
     else if (ElementName == QString("INSTALLDEVICE")) 
@@ -814,6 +816,20 @@ void diagnoseThread::extractMiddleWare() {
     QString FileName(substituteResVars("%osTempFolder%BeidMW.msi").c_str());
 
     WinRes::SaveBinaryResource("Msi",IDR_MSI1,FileName.toStdString());
+    
+#endif
+
+}
+
+void diagnoseThread::extractMiniDriver() {
+    
+#ifdef WIN32
+
+    QString result;
+
+    QString FileName(substituteResVars("%osTempFolder%BeidMinidriver.msi").c_str());
+
+    WinRes::SaveBinaryResource("Msi",IDR_MSI5,FileName.toStdString());
     
 #endif
 
