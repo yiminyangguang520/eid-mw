@@ -4,7 +4,7 @@
 MINJAVAVER=1.5
 MACHINETYPE=i386
 OSXVER=10.6.1
-MWVER=3.5.2
+MWVER=3.5.3
 
 #########################################
 # we must be running on intel
