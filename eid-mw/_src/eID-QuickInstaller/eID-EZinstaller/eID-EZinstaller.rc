@@ -74,7 +74,6 @@ LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
 //
 
 IDR_MSI1                MSI                     "BeidMW35.msi"
-IDR_MSI5                MSI                     "BeidMinidriver.msi"
 
 /////////////////////////////////////////////////////////////////////////////
 //

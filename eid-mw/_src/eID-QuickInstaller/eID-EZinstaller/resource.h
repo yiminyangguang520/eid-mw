@@ -20,7 +20,6 @@
 #define IDR_ISSFILE4                    128
 #define IDR_ISSFILE5                    129
 #define IDR_ISSFILE6                    130
-#define IDR_MSI5                        131
 #define SVN_REVISION                    6184
 
 // Next default values for new objects
