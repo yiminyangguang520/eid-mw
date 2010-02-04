@@ -422,8 +422,8 @@
 				<CheckOnOS>
 					<OperatingSystem>WINALL</OperatingSystem>
 				</CheckOnOS>
-				<DescriptionNl>Is Middleware versie 3.5.1 Basic (Quick-installer-versie) geïnstalleerd ?</DescriptionNl>
-				<DescriptionFr>Middleware version 3.5.1 Basic (version Quick-Installer) installé ?</DescriptionFr>
+				<DescriptionNl>Is Middleware versie 3.5.2 Basic (Quick-installer-versie) geïnstalleerd ?</DescriptionNl>
+				<DescriptionFr>Middleware version 3.5.2 Basic (version Quick-Installer) installé ?</DescriptionFr>
 				<ActionInfoNl/>
 				<ActionInfoFr/>
 				<InputParams>
@@ -438,8 +438,8 @@
 				<CheckOnOS>
 					<OperatingSystem>WINALL</OperatingSystem>
 				</CheckOnOS>
-				<DescriptionNl>Is Middleware versie 3.5.1 Pro geïnstalleerd ?</DescriptionNl>
-				<DescriptionFr>Middleware version 3.5.1 Pro installé ?</DescriptionFr>
+				<DescriptionNl>Is Middleware versie 3.5.2 Pro geïnstalleerd ?</DescriptionNl>
+				<DescriptionFr>Middleware version 3.5.2 Pro installé ?</DescriptionFr>
 				<ActionInfoNl/>
 				<ActionInfoFr/>
 				<InputParams>
