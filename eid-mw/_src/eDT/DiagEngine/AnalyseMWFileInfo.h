@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <exception>
 #include <sstream>
+#include <set>
 #include <vector>
 #include <string>
 
@@ -32,28 +33,42 @@
 #include "folder.h"
 #include "util.h"
 #include "MD5Sum.h"
+#include "repository.h"
 #ifdef __APPLE__
 #include "mac_helper.h"
 #endif
 
+typedef std::set<std::wstring> FileNameSet;
+
 #ifdef WIN32
-static wchar_t* FilesSystem[]=
+static wchar_t* FilesSystem32[]=
 {
 	  L"beid35applayer.dll"
 	, L"beid35cardlayer.dll"
 	, L"beid35common.dll"
 	, L"beid35DlgsWin32.dll"
-//	, L"siscardplugins\\siscardplugin1_BE_EID_35__ACS_ACR38U__.dll"
 	, L"libeay32_0_9_8g.dll"
 	, L"ssleay32_0_9_8g.dll"
-//	, L"xerces-c_2_8.dll"
 	, L"xerces-c_3_1.dll"
 	, L"beidCSP.dll"
 	, L"beidCSPlib.dll"
 	, L"beidpkcs11.dll"
 	, L"Belgium Identity Card PKCS11.dll"
 };
-static wchar_t* FilesApp []=
+
+static wchar_t* FilesSystem64[]=
+{
+	  L"beid35applayer.dll"
+	, L"beid35cardlayer.dll"
+	, L"beid35common.dll"
+	, L"beid35DlgsWin32.dll"
+	, L"libeay32_0_9_8g.dll"
+	, L"ssleay32_0_9_8g.dll"
+	, L"xerces-c_3_1.dll"
+	, L"beidpkcs11.dll"
+	, L"Belgium Identity Card PKCS11.dll"
+};
+static wchar_t* FilesApp64[]=
 {
 	  L"beid35libCpp.dll"
 	, L"beid35gui.exe"
@@ -133,8 +148,8 @@ public:
 	{
 		m_testName		= "middleware_files";
 		m_friendlyName	= "Middleware files";
-
 	}
+
 	virtual ~AnalyseMWFileInfo()
 	{
 	}
@@ -148,8 +163,56 @@ public:
 		int			retVal		= DIAGLIB_OK;
 		Report_TYPE reportType	= REPORT_TYPE_RESULT;
 		wchar_t		sepa		= L'~';
+		FileNameSet	sysFiles;
+		FileNameSet	appFiles;
 
 		reportPrintHeader2(reportType, L"Middleware files info", sepa);
+
+		if(REPOSITORY.value(L"system_info.arch").compare(L"32")==0)			// on 32-bit windows. check for the 32-bit files..
+		{
+			sysFiles.insert(L"beid35applayer.dll");
+			sysFiles.insert(L"beid35cardlayer.dll");
+			sysFiles.insert(L"beid35common.dll");
+			sysFiles.insert(L"beid35dlgswin32.dll");
+			sysFiles.insert(L"libeay32_0_9_8g.dll");
+			sysFiles.insert(L"ssleay32_0_9_8g.dll");
+			sysFiles.insert(L"xerces-c_3_1.dll");
+			sysFiles.insert(L"beidcsp.dll");					// <-- CSP instead of minidriver
+			sysFiles.insert(L"beidcsplib.dll");
+			sysFiles.insert(L"beidpkcs11.dll");
+
+			appFiles.insert(L"beid35libcpp.dll");
+			appFiles.insert(L"beid35gui.exe");
+			appFiles.insert(L"eidmw_en.qm");
+			appFiles.insert(L"eidmw_nl.qm");
+			appFiles.insert(L"eidmw_fr.qm");
+			appFiles.insert(L"eidmw_de.qm");
+			appFiles.insert(L"qtcore4.dll");
+			appFiles.insert(L"qtgui4.dll");
+			appFiles.insert(L"imageformats\\qjpeg4.dll");
+		}
+		else														// otherwise, use the 64-bit files
+		{
+			sysFiles.insert(L"beid35applayer.dll");
+			sysFiles.insert(L"beid35cardlayer.dll");
+			sysFiles.insert(L"beid35common.dll");
+			sysFiles.insert(L"beid35dlgswin32.dll");
+			sysFiles.insert(L"libeay32_0_9_8g.dll");
+			sysFiles.insert(L"ssleay32_0_9_8g.dll");
+			sysFiles.insert(L"xerces-c_3_1.dll");
+			sysFiles.insert(L"beidmdrv.dll");					// <-- minidriver instead of CSP
+			sysFiles.insert(L"beidpkcs11.dll");
+
+			appFiles.insert(L"beid35libcpp.dll");
+			appFiles.insert(L"beid35gui.exe");
+			appFiles.insert(L"eidmw_en.qm");
+			appFiles.insert(L"eidmw_nl.qm");
+			appFiles.insert(L"eidmw_fr.qm");
+			appFiles.insert(L"eidmw_de.qm");
+			appFiles.insert(L"qtcore4.dll");
+			appFiles.insert(L"qtgui4.dll");
+			appFiles.insert(L"imageformats\\qjpeg4.dll");
+		}
 
 		try
 		{
@@ -182,12 +245,13 @@ public:
 			std::wstring fullPath;
 			
 			REP_PREFIX(L"system");
-			for (size_t idx=0;idx<sizeof(FilesSystem)/sizeof(wchar_t*);idx++)
+
+			for(FileNameSet::const_iterator sysfile=sysFiles.begin();sysfile!=sysFiles.end();sysfile++)
 			{
-				REP_PREFIX(FilesSystem[idx]);
+				REP_PREFIX(*sysfile);
 				bool exist = false;
 				fullPath = system;
-				fullPath += FilesSystem[idx];
+				fullPath += *sysfile;
 				retVal = fileExists(fullPath,&exist);
 				if (DIAGLIB_OK != retVal)
 				{
@@ -201,7 +265,7 @@ public:
 					text << L"not "; 
 				}
 				text << L"found: "; 
-				text << FilesSystem[idx] << L"";
+				text << *sysfile << L"";
 
 				REP_CONTRIBUTE(L"exists",exist?L"true":L"false");
 
@@ -220,14 +284,16 @@ public:
 			}
 
 			REP_UNPREFIX();
+
 			resultToReport(reportType,L"[Info ] Detecting application files");
 			REP_PREFIX(L"application");
-			for (size_t idx=0;idx<sizeof(FilesApp)/sizeof(wchar_t*);idx++)
+
+			for(FileNameSet::const_iterator appfile=appFiles.begin();appfile!=appFiles.end();appfile++)
 			{
-				REP_PREFIX(FilesApp[idx]);
+				REP_PREFIX(*appfile);
 				bool exist = false;
 				fullPath = appfolder;
-				fullPath += FilesApp[idx];
+				fullPath += *appfile;
 				retVal = fileExists(fullPath,&exist);
 				if (DIAGLIB_OK != retVal)
 				{
@@ -241,7 +307,7 @@ public:
 					text << L"not "; 
 				}
 				text << L"found: ";
-				text << FilesApp[idx] << L"";
+				text << *appfile << L"";
 
 				REP_CONTRIBUTE(L"exists",exist?L"true":L"false");
 
@@ -289,6 +355,7 @@ public:
 		return retVal;
 	}
 private:
+
 #ifdef __APPLE__	
 
 	std::string getAppPath()

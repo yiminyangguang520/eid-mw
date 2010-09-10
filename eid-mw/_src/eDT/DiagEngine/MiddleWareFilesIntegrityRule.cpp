@@ -57,7 +57,7 @@ MetaRuleVerdict MiddleWareFilesIntegrityRule::verdict(Repository evidence) const
 	
 //3.5.4
 
-	if(evidence.value(L"system_info.arch").compare(L"32")==0)						// on 32-bit windows. use the 32-bit MD5 sums
+	if(evidence.value(L"system_info.arch").compare(L"32")==0)			// on 32-bit windows. use the 32-bit MD5 sums
 	{
 		sys_files.insert(make_pair(L"beid35applayer_dll",				L"9400e8e18aba6308f1b0111d1e42948a"));
 		sys_files.insert(make_pair(L"beid35cardlayer_dll",				L"b3f6af36396130b13b37dccc1272cebb"));
@@ -69,7 +69,6 @@ MetaRuleVerdict MiddleWareFilesIntegrityRule::verdict(Repository evidence) const
 		sys_files.insert(make_pair(L"beidcsp_dll",						L"d8dc44b28e4def1923d262a7d3ed7897"));
 		sys_files.insert(make_pair(L"beidcsplib_dll",					L"00032c3cad3fe9042f610d4a820213d3"));
 		sys_files.insert(make_pair(L"beidpkcs11_dll",					L"f164ec18270d406aaa883631f5a7b44a"));
-		sys_files.insert(make_pair(L"belgium_identity_card_pkcs11_dll",	L"f164ec18270d406aaa883631f5a7b44a"));
 
 		app_files.insert(make_pair(L"beid35libcpp_dll",					L"b736c0074dc06496948c917f074f4bcb"));
 		app_files.insert(make_pair(L"beid35gui_exe",					L"6d3945ac00343d5df117334825b2b5a9"));
@@ -83,27 +82,25 @@ MetaRuleVerdict MiddleWareFilesIntegrityRule::verdict(Repository evidence) const
 	}
 	else if(evidence.value(L"system_info.arch").compare(L"64")==0)					// on 64-bit windows. use the 64-bit MD5 sums
 	{
-		sys_files.insert(make_pair(L"beid35applayer_dll",				L"9400e8e18aba6308f1b0111d1e42948a"));	    // TODO: replace with 64-bit MD5s!
-		sys_files.insert(make_pair(L"beid35cardlayer_dll",				L"b3f6af36396130b13b37dccc1272cebb"));
-		sys_files.insert(make_pair(L"beid35common_dll",					L"7953a843ef109416dbb281e9bd323b1b"));
-		sys_files.insert(make_pair(L"beid35dlgswin32_dll",				L"3f6d94f9018b6378a19fcc47cab1b962"));
-		sys_files.insert(make_pair(L"libeay32_0_9_8g_dll",				L"e03b64b9be9cb341bdc16b16954ecaae"));
-		sys_files.insert(make_pair(L"ssleay32_0_9_8g_dll",				L"099b6b991321ae4a97ff11d879722dda"));
-		sys_files.insert(make_pair(L"xerces-c_3_1_dll",					L"cfd52a7c6cf317738ee136cf7e9e612e"));
-		sys_files.insert(make_pair(L"beidcsp_dll",						L"d8dc44b28e4def1923d262a7d3ed7897"));
-		sys_files.insert(make_pair(L"beidcsplib_dll",					L"00032c3cad3fe9042f610d4a820213d3"));
-		sys_files.insert(make_pair(L"beidpkcs11_dll",					L"f164ec18270d406aaa883631f5a7b44a"));
-		sys_files.insert(make_pair(L"belgium_identity_card_pkcs11_dll",	L"f164ec18270d406aaa883631f5a7b44a"));
+		sys_files.insert(make_pair(L"beid35applayer_dll",				L"9fd625f09e61dec0030bdca88c7fff4c"));	    //
+		sys_files.insert(make_pair(L"beid35cardlayer_dll",				L"725b8ae8f4904cbd7e9049d8e527cb00"));		//
+		sys_files.insert(make_pair(L"beid35common_dll",					L"91424d9f10b35085dc3b77b4112dcafe"));		//
+		sys_files.insert(make_pair(L"beid35dlgswin32_dll",				L"127fdd53b5e6a156aa75b5337125d009"));		//
+		sys_files.insert(make_pair(L"libeay32_0_9_8g_dll",				L"4a472b9676039c11a2a8db93fd59b2cf"));		//
+		sys_files.insert(make_pair(L"ssleay32_0_9_8g_dll",				L"a8e0ab52299bc87f1eb080e2a3fc9bbe"));		//
+		sys_files.insert(make_pair(L"xerces-c_3_1_dll",					L"a523229a2bf37a442953b06e4585b8cf"));		//
+		sys_files.insert(make_pair(L"beidpkcs11_dll",					L"47432fb1ac7b02c6e72574596b937e77"));		//
+		sys_files.insert(make_pair(L"beidmdrv_dll",						L"4a9afa181e38d3eaed64007e777444e2"));		//
 
-		app_files.insert(make_pair(L"beid35libcpp_dll",					L"b736c0074dc06496948c917f074f4bcb"));
-		app_files.insert(make_pair(L"beid35gui_exe",					L"6d3945ac00343d5df117334825b2b5a9"));
-		app_files.insert(make_pair(L"eidmw_en_qm",						L"a39db5a36aacdf68df256d7314374602"));
-		app_files.insert(make_pair(L"eidmw_nl_qm",						L"7e7d17e274ecfbcbb62fb5f151a4d33c"));
-		app_files.insert(make_pair(L"eidmw_fr_qm",						L"f9e4ceb126d822e40dc2fd6f2ebfeb33"));
-		app_files.insert(make_pair(L"eidmw_de_qm",						L"f3789b09814a8f5e63905ae4a6b5f668"));
-		app_files.insert(make_pair(L"qtcore4_dll",						L"ecd1e6a6c7aa2a8adf17d5fed5170dc4"));
-		app_files.insert(make_pair(L"qtgui4_dll",						L"6aa72e28888ef013eea042471b7db7e0"));
-		app_files.insert(make_pair(L"imageformats\\qjpeg4_dll",			L"b49c7183d7352ab7dbd51fae7f593b02"));
+		app_files.insert(make_pair(L"beid35libcpp_dll",					L"0db93fb8044bd54dd762ce94c7a885b9"));		//
+		app_files.insert(make_pair(L"beid35gui_exe",					L"ff8f27231322e3e38e08d0541d738170"));		//
+		app_files.insert(make_pair(L"eidmw_en_qm",						L"12b6ae278c774af80ee5244e487990b3"));		//
+		app_files.insert(make_pair(L"eidmw_nl_qm",						L"ae292ca699af2faa84ed2c5ad1dcc761"));		//
+		app_files.insert(make_pair(L"eidmw_fr_qm",						L"41374b61fa6c5abc47e1f5c115698492"));		//
+		app_files.insert(make_pair(L"eidmw_de_qm",						L"2833914b4beeae324d0e34c6e6c5dcae"));		//
+		app_files.insert(make_pair(L"qtcore4_dll",						L"08333a59d1f2794ffd1730efe008b675"));		//
+		app_files.insert(make_pair(L"qtgui4_dll",						L"2b09698d39413867afd547c31f12cfa6"));		//
+		app_files.insert(make_pair(L"imageformats\\qjpeg4_dll",			L"b0f781d8baf2f5b0eb9659b569ee0b2f"));		//
 	}
 	else
 	{

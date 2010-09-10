@@ -79,6 +79,7 @@ private:
 #define REP_AVAILABLE		Repository::instance().available
 #define REP_RESULTS			Repository::instance().results
 #define REP_VALUES			Repository::instance().values
+#define REP_VALUE			Repository::instance().values
 #define REP_VERDICT_COUNT	Repository::instance().verdictCount
 #define REP_VERDICT			Repository::instance().verdict
 
