@@ -28,7 +28,7 @@ class WinSCardDllLocksRule : public MetaRule
 public:
 	WinSCardDllLocksRule();
 	~WinSCardDllLocksRule() throw();
-	MetaRuleVerdict verdict(Repository evidence) const;
+	MetaRuleVerdict verdict(Repository& evidence) const;
 private:
 	std::wstring		   m_key;
 	std::set<std::wstring> m_expected;

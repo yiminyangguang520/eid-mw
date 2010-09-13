@@ -40,7 +40,7 @@ HPProtectToolsRule::~HPProtectToolsRule() throw()
 {
 }
 
-MetaRuleVerdict HPProtectToolsRule::verdict(Repository evidence) const
+MetaRuleVerdict HPProtectToolsRule::verdict(Repository& evidence) const
 {
 	ContributionSet pt_processes_running;
 	for(ContributionSet::const_iterator i=m_ptkeys.begin();i!=m_ptkeys.end();i++)

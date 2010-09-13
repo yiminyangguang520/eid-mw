@@ -30,7 +30,7 @@ class MetaRule
 public:
 								MetaRule(const std::wstring name, const std::wstring description);
 	virtual					   ~MetaRule() throw();
-	virtual MetaRuleVerdict		verdict (Repository evidence) const=0;
+	virtual MetaRuleVerdict		verdict (Repository& evidence) const=0;
 	const	std::wstring&		name(void) const;
 	const	std::wstring&		description(void) const;
 private:

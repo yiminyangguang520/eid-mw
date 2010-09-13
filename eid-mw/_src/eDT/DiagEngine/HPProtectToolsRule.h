@@ -28,7 +28,7 @@ class HPProtectToolsRule : public MetaRule
 public:
 	HPProtectToolsRule();
 	~HPProtectToolsRule() throw();
-	MetaRuleVerdict verdict(Repository evidence) const;
+	MetaRuleVerdict verdict(Repository& evidence) const;
 private:
 	std::set<std::wstring> m_ptkeys;
 };

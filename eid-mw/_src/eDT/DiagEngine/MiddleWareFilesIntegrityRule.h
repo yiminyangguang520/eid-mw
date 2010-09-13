@@ -31,9 +31,9 @@ class MiddleWareFilesIntegrityRule : public MetaRule
 public:
 	MiddleWareFilesIntegrityRule();
 	~MiddleWareFilesIntegrityRule() throw();
-	MetaRuleVerdict verdict(Repository evidence) const;
+	MetaRuleVerdict verdict(Repository& evidence) const;
 private:
-	void			testCategory(Repository evidence, std::wstring category, FileMD5Map data, FileNameSet& missing, FileNameSet& corrupt) const;
+	void			testCategory(Repository& evidence, std::wstring category, FileMD5Map data, FileNameSet& missing, FileNameSet& corrupt) const;
 #ifndef WIN32
 	FileMD5Map		m_oth_files;
 #endif

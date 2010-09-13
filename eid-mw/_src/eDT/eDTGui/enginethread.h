@@ -41,29 +41,29 @@ static struct testSequence tstSequence[]=
 {
 	
 #ifdef WIN32	
-	 {"system_info"				, "device_info"				, "diagnostics"}
-	,{"device_info"				, "software_info"			, "diagnostics"}
-	,{"software_info"			, "service_info"			, "diagnostics"}
-	,{"service_info"			, "process_info"			, "diagnostics"}
-	,{"process_info"			, "module_info"				, "diagnostics"}
-	,{"module_info"				, "hardware_info"			, "diagnostics"}	
-	,{"hardware_info"			, "middleware_files"		, "diagnostics"}
-	,{"middleware_files"		, "reader_detect"			, "diagnostics"}
+	 {"system_info"				, "device_info"				, "device_info"}
+	,{"device_info"				, "software_info"			, "software_info"}
+	,{"software_info"			, "service_info"			, "service_info"}
+	,{"service_info"			, "process_info"			, "process_info"}
+	,{"process_info"			, "module_info"				, "module_info"}
+	,{"module_info"				, "hardware_info"			, "hardware_info"}	
+	,{"hardware_info"			, "middleware_files"		, "middleware_files"}
+	,{"middleware_files"		, "reader_detect"			, "reader_detect"}
 	//------ end info part ----
 	//------ begin infrastructure part ----
-	,{"reader_detect"			, "pcsc_detect"				, "diagnostics"}
-	,{"pcsc_detect"				, "pcsc_readerlist"			, "diagnostics"}
-	,{"pcsc_readerlist"			, "card_detect"				, "diagnostics"}
-	,{"card_detect"				, "middleware_info"			, "diagnostics"}
+	,{"reader_detect"			, "pcsc_detect"				, "pcsc_detect"}
+	,{"pcsc_detect"				, "pcsc_readerlist"			, "pcsc_readerlist"}
+	,{"pcsc_readerlist"			, "card_detect"				, "card_detect"}
+	,{"card_detect"				, "middleware_info"			, "middleware_info"}
 	//------ end infrastructure part ----
 	//------ begin middleware part ----
-	,{"middleware_info"			, "middleware_readerlist"	, "diagnostics"}
-	,{"middleware_readerlist"	, "middleware_cardlist"		, "pcsc_readerlist"}
-	,{"middleware_cardlist"		, "middleware_access"		, "pcsc_cardlist"}
-	,{"middleware_access"		, "pcsc_readerlist"			, "diagnostics"}
+	,{"middleware_info"			, "middleware_readerlist"	, "middleware_readerlist"}
+	,{"middleware_readerlist"	, "middleware_cardlist"		, "middleware_cardlist"}
+	,{"middleware_cardlist"		, "middleware_access"		, "middleware_access"}
+	,{"middleware_access"		, "pcsc_readerlist"			, "pcsc_readerlist"}
 
-	,{"pcsc_readerlist"			, "pcsc_cardlist"			, "diagnostics"}
-	,{"pcsc_cardlist"			, "pcsc_access"				, "diagnostics"}
+	,{"pcsc_readerlist"			, "pcsc_cardlist"			, "pcsc_cardlist"}
+	,{"pcsc_cardlist"			, "pcsc_access"				, "pcsc_access"}
 	,{"pcsc_access"				, "diagnostics"				, "pcsc_timing"}
 	,{"pcsc_timing"				, "diagnostics"				, "diagnostics"}
 	,{"diagnostics"				, ""						, ""}

@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
+#include <time.h>
 
 #include "diaglib.h"
 #include "report.h"
@@ -167,10 +168,14 @@ int reportLoadResources()
 	}
 	if(g_pfile_level1 && g_reportFirstOpen)
 	{
+		time_t ltime=time(NULL); /* get current cal time */
+
 #ifdef WIN32
 		fwprintf_s(g_pfile_level1,L"RUNNING eDT VERSION: %hs\n",diaglibVersion());
+		fwprintf_s(g_pfile_level1,L"TIMESTAMP: %s\n\n",_wasctime(localtime(&ltime)));
 #elif __APPLE__
 		fwprintf_s(g_pfile_level1,L"RUNNING eDT VERSION: %s\n",diaglibVersion());
+		fwprintf_s(g_pfile_level1,L"TIMESTAMP: %s\n\n",asctime(localtime(&ltime)));
 #endif	
 	}
 	

@@ -32,7 +32,7 @@ MiddleWareFilesIntegrityRule::~MiddleWareFilesIntegrityRule() throw()
 {
 }
 
-void MiddleWareFilesIntegrityRule::testCategory(Repository evidence, std::wstring category, FileMD5Map data, FileNameSet& missing, FileNameSet& corrupt) const
+void MiddleWareFilesIntegrityRule::testCategory(Repository& evidence, std::wstring category, FileMD5Map data, FileNameSet& missing, FileNameSet& corrupt) const
 {
 	for(FileMD5Map::const_iterator file=data.begin();file!=data.end();file++)
 	{
@@ -47,7 +47,7 @@ void MiddleWareFilesIntegrityRule::testCategory(Repository evidence, std::wstrin
 	}
 }
 
-MetaRuleVerdict MiddleWareFilesIntegrityRule::verdict(Repository evidence) const
+MetaRuleVerdict MiddleWareFilesIntegrityRule::verdict(Repository& evidence) const
 {
 	FileNameSet		missing,corrupt;
 	FileMD5Map		sys_files;
@@ -80,7 +80,7 @@ MetaRuleVerdict MiddleWareFilesIntegrityRule::verdict(Repository evidence) const
 		app_files.insert(make_pair(L"qtgui4_dll",						L"6aa72e28888ef013eea042471b7db7e0"));
 		app_files.insert(make_pair(L"imageformats\\qjpeg4_dll",			L"b49c7183d7352ab7dbd51fae7f593b02"));
 	}
-	else if(evidence.value(L"system_info.arch").compare(L"64")==0)					// on 64-bit windows. use the 64-bit MD5 sums
+	else if(evidence.value(L"system_info.arch").compare(L"64")==0)		// on 64-bit windows. use the 64-bit MD5 sums
 	{
 		sys_files.insert(make_pair(L"beid35applayer_dll",				L"9fd625f09e61dec0030bdca88c7fff4c"));	    //
 		sys_files.insert(make_pair(L"beid35cardlayer_dll",				L"725b8ae8f4904cbd7e9049d8e527cb00"));		//
@@ -169,11 +169,22 @@ MetaRuleVerdict MiddleWareFilesIntegrityRule::verdict(Repository evidence) const
 		{
 			detailtext << L"The following file" << (corrupt.size()==1?L" is":L"s are") << L" corrupted: [" << join<std::wstring,FileNameSet>(corrupt,L",") << L"]\n";
 			curetext << L"- Make sure your system is free of Malware before proceeding!\n";
+
+			evidence.prefix(L"corrupt");
+			for(FileNameSet::const_iterator cfile=corrupt.begin();cfile!=corrupt.end();cfile++)
+				evidence.contribute(L"filename",*cfile);
+			evidence.unprefix();
 		}
 
 		if(!missing.empty())
+		{
 			detailtext << L"The following file" << (missing.size()==1?L" is":L"s are") << L" missing: [" + join<std::wstring,FileNameSet>(missing,L",") << L"]\n";
-			
+			evidence.prefix(L"missing");
+			for(FileNameSet::const_iterator mfile=missing.begin();mfile!=missing.end();mfile++)
+				evidence.contribute(L"filename",*mfile);
+			evidence.unprefix();
+		}
+
 		curetext << L"- Re-install eID Middleware from http://eid.belgium.be/\n";
 
 		return MetaRuleVerdict(true,L"There are problems with the eID Middleware installation",detailtext.str(),curetext.str(),name());

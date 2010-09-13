@@ -41,7 +41,7 @@ WinSCardDllLocksRule::~WinSCardDllLocksRule() throw()
 {
 }
 
-MetaRuleVerdict WinSCardDllLocksRule::verdict(Repository evidence) const
+MetaRuleVerdict WinSCardDllLocksRule::verdict(Repository& evidence) const
 {
 	// get all processes that use winscard.dll (from the contributed output of the module_info module)
 	ContributionSet found=evidence.values(m_key);

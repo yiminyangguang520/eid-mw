@@ -77,6 +77,7 @@ public:
 					{
 						resultToReport(REPORT_TYPE_RESULT,(rule->second->name() + L":Established Diagnosis:").	c_str());
 						resultToReport(REPORT_TYPE_RESULT,verdict.verdict().									c_str());
+						resultToReport(REPORT_TYPE_RESULT,verdict.details().									c_str());
 						resultToReport(REPORT_TYPE_RESULT,verdict.corrective().									c_str());
 						REP_AVAILABLE(true);
 						REP_CONTRIBUTE(L"diagnosis",L"problem");

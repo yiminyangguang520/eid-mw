@@ -166,10 +166,16 @@ public:
 		FileNameSet	sysFiles;
 		FileNameSet	appFiles;
 
+		Folder_ID	appfolder;
+		Folder_ID	system;
+
 		reportPrintHeader2(reportType, L"Middleware files info", sepa);
 
 		if(REPOSITORY.value(L"system_info.arch").compare(L"32")==0)			// on 32-bit windows. check for the 32-bit files..
 		{
+			folderGetPath(FOLDER_SYSTEM,&system);
+			folderGetPath(FOLDER_APP,&appfolder);
+
 			sysFiles.insert(L"beid35applayer.dll");
 			sysFiles.insert(L"beid35cardlayer.dll");
 			sysFiles.insert(L"beid35common.dll");
@@ -193,6 +199,9 @@ public:
 		}
 		else														// otherwise, use the 64-bit files
 		{
+			system=L"C:\\Windows\\Sysnative\\";						// try to access 64-libs on 64-bit Windows
+			folderGetPath(FOLDER_APP,&appfolder);					// (we're a 32-bit app and we'd get redirected otherwise)
+
 			sysFiles.insert(L"beid35applayer.dll");
 			sysFiles.insert(L"beid35cardlayer.dll");
 			sysFiles.insert(L"beid35common.dll");
@@ -222,10 +231,9 @@ public:
 			//------------------------------------------
 			resultToReport(reportType,L"[Info ] Detecting installed Middleware files");
 
-			Folder_ID system;
 			folderGetPath(FOLDER_SYSTEM,&system);
 
-			Folder_ID appfolder;
+			
 			folderGetPath(FOLDER_APP,&appfolder);
 #ifdef __APPLE__
 			appfolder += L"eID-Viewer.app/Contents/MacOS/";
@@ -352,6 +360,8 @@ public:
 			retVal = exc.getErr();
 		}
 		resultToReport(reportType,m_bPassed);
+
+		folderGetPath(FOLDER_SYSTEM,&system);	//reset in case we're using the Wow64 hack
 		return retVal;
 	}
 private:
