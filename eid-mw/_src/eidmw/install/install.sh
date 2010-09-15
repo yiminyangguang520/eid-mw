@@ -226,7 +226,7 @@ then
 		apt-get install libpcsclite1
 		apt-get install libacr38u
 		apt-get install pcscd
-		apt-get install libaudio2
+		apt-get install libqtgui4
 	fi
 	if [ -e "/etc/SuSE-release" ]
 	then
@@ -247,6 +247,7 @@ then
 		yum install xerces-c-2.8.0
 		yum install pcsc-lite-libs
 		yum install pcsc-lite
+		yum install qt-x11
 	fi
 
 
@@ -254,10 +255,13 @@ then
 	## add the directory where the so files are installed to the loader's config file
 	## and run the ldconfig program to rebuild the loaders's cache
 	#######
-        echo "$INSTALL_DIR/lib" >> /etc/ld.so.conf
-        echo "$INSTALL_DIR/lib/beidqt" >> /etc/ld.so.conf
-	echo "$INSTALL_DIR_SISPLUGINS" >> /etc/ld.so.conf
-	/sbin/ldconfig
+        #echo "$INSTALL_DIR/lib" >> /etc/ld.so.conf
+        #echo "$INSTALL_DIR/lib/beidqt" >> /etc/ld.so.conf
+	#echo "$INSTALL_DIR_SISPLUGINS" >> /etc/ld.so.conf
+        ln -s $INSTALL_DIR/lib/libbeidcardlayer.so.3 /usr/lib/libbeidcardlayer.so.3
+        ln -s $INSTALL_DIR/lib/libbeidcommon.so.3 /usr/lib/libbeidcommon.so.3
+        ln -s $INSTALL_DIR/lib/libbeiddialogsQT.so.3 /usr/lib/libbeiddialogsQT.so.3
+	/sbin/ldconfig $INSTALL_DIR/lib
 
 	LIBLIST=`ls $INSTALL_DIR/lib/libbeid*.so.*.*.* 2> /dev/null`
 
