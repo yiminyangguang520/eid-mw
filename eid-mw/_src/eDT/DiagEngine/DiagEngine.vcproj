@@ -162,10 +162,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MiddleWareFilesIntegrityRule.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\WinSCardDllLocksRule.cpp"
 				>
 			</File>

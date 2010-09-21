@@ -34,12 +34,13 @@
 #include "util.h"
 #include "MD5Sum.h"
 #include "repository.h"
+
 #ifdef __APPLE__
 #include "mac_helper.h"
 #endif
 
 typedef std::set<std::wstring> FileNameSet;
-
+/*
 #ifdef WIN32
 static wchar_t* FilesSystem32[]=
 {
@@ -126,13 +127,13 @@ static wchar_t* FilesOther []=
 	L"/usr/local/lib/beidqt/QtCore"
 	, L"/usr/local/lib/beidqt/QtGui"
 	, L"/usr/local/lib/beidqt/plugins/imageformats/libbeidjpeg.dylib"
-
+*/
 //	L"/Library/Frameworks/QtCore.framework/Versions/beid_*/QtCore"
 //	, L"/Library/Frameworks/QtGui.framework/Versions/beid_*/QtGui"
 //	, L"/Developer/Applications/Qt/plugins/imageformats/libbeidjpeg.dylib"
-};
+/*};
 #endif
-
+*/
 //******************************************
 // Middleware File info
 // Tries to detect that all necessary files are available
@@ -171,58 +172,38 @@ public:
 
 		reportPrintHeader2(reportType, L"Middleware files info", sepa);
 
-		if(REPOSITORY.value(L"system_info.arch").compare(L"32")==0)			// on 32-bit windows. check for the 32-bit files..
+#ifdef WIN32
+		sysFiles.insert(L"beid35applayer.dll");
+		sysFiles.insert(L"beid35cardlayer.dll");
+		sysFiles.insert(L"beid35common.dll");
+		sysFiles.insert(L"beid35dlgswin32.dll");
+		sysFiles.insert(L"libeay32_0_9_8g.dll");
+		sysFiles.insert(L"ssleay32_0_9_8g.dll");
+		sysFiles.insert(L"xerces-c_3_1.dll");
+		sysFiles.insert(L"beidpkcs11.dll");
+		//if(REPOSITORY.value(L"system_info.arch").compare(L"32")==0)
+		if(REPOSITORY.value(L"system_info.MajorVersion").compare(L"5")==0)
 		{
-			folderGetPath(FOLDER_SYSTEM,&system);
-			folderGetPath(FOLDER_APP,&appfolder);
-
-			sysFiles.insert(L"beid35applayer.dll");
-			sysFiles.insert(L"beid35cardlayer.dll");
-			sysFiles.insert(L"beid35common.dll");
-			sysFiles.insert(L"beid35dlgswin32.dll");
-			sysFiles.insert(L"libeay32_0_9_8g.dll");
-			sysFiles.insert(L"ssleay32_0_9_8g.dll");
-			sysFiles.insert(L"xerces-c_3_1.dll");
-			sysFiles.insert(L"beidcsp.dll");					// <-- CSP instead of minidriver
 			sysFiles.insert(L"beidcsplib.dll");
-			sysFiles.insert(L"beidpkcs11.dll");
-
-			appFiles.insert(L"beid35libcpp.dll");
-			appFiles.insert(L"beid35gui.exe");
-			appFiles.insert(L"eidmw_en.qm");
-			appFiles.insert(L"eidmw_nl.qm");
-			appFiles.insert(L"eidmw_fr.qm");
-			appFiles.insert(L"eidmw_de.qm");
-			appFiles.insert(L"qtcore4.dll");
-			appFiles.insert(L"qtgui4.dll");
-			appFiles.insert(L"imageformats\\qjpeg4.dll");
+			sysFiles.insert(L"beidcsp.dll");	// <-- CSP instead of minidriver
 		}
-		else														// otherwise, use the 64-bit files
-		{
-			system=L"C:\\Windows\\Sysnative\\";						// try to access 64-libs on 64-bit Windows
-			folderGetPath(FOLDER_APP,&appfolder);					// (we're a 32-bit app and we'd get redirected otherwise)
+		else			
+			sysFiles.insert(L"beidmdrv.dll");	// <-- minidriver instead of CSP
 
-			sysFiles.insert(L"beid35applayer.dll");
-			sysFiles.insert(L"beid35cardlayer.dll");
-			sysFiles.insert(L"beid35common.dll");
-			sysFiles.insert(L"beid35dlgswin32.dll");
-			sysFiles.insert(L"libeay32_0_9_8g.dll");
-			sysFiles.insert(L"ssleay32_0_9_8g.dll");
-			sysFiles.insert(L"xerces-c_3_1.dll");
-			sysFiles.insert(L"beidmdrv.dll");					// <-- minidriver instead of CSP
-			sysFiles.insert(L"beidpkcs11.dll");
+		appFiles.insert(L"beid35libcpp.dll");
+		appFiles.insert(L"beid35gui.exe");
+		appFiles.insert(L"eidmw_en.qm");
+		appFiles.insert(L"eidmw_nl.qm");
+		appFiles.insert(L"eidmw_fr.qm");
+		appFiles.insert(L"eidmw_de.qm");
+		appFiles.insert(L"qtcore4.dll");
+		appFiles.insert(L"qtgui4.dll");
+		appFiles.insert(L"imageformats\\qjpeg4.dll");
 
-			appFiles.insert(L"beid35libcpp.dll");
-			appFiles.insert(L"beid35gui.exe");
-			appFiles.insert(L"eidmw_en.qm");
-			appFiles.insert(L"eidmw_nl.qm");
-			appFiles.insert(L"eidmw_fr.qm");
-			appFiles.insert(L"eidmw_de.qm");
-			appFiles.insert(L"qtcore4.dll");
-			appFiles.insert(L"qtgui4.dll");
-			appFiles.insert(L"imageformats\\qjpeg4.dll");
-		}
-
+#else
+		//create Mac lists here
+#endif
+		
 		try
 		{
 
@@ -231,9 +212,7 @@ public:
 			//------------------------------------------
 			resultToReport(reportType,L"[Info ] Detecting installed Middleware files");
 
-			folderGetPath(FOLDER_SYSTEM,&system);
-
-			
+			folderGetPath(FOLDER_SYSTEM,&system);			
 			folderGetPath(FOLDER_APP,&appfolder);
 #ifdef __APPLE__
 			appfolder += L"eID-Viewer.app/Contents/MacOS/";

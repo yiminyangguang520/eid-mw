@@ -27,7 +27,7 @@
 #include "MetaRuleVerdict.h"
 #include "WinSCardDllLocksRule.h"
 #include "HPProtectToolsRule.h"
-#include "MiddleWareFilesIntegrityRule.h"
+//#include "MiddleWareFilesIntegrityRule.h"
 
 typedef std::multimap<double,MetaRule*,greater<double> > MetaRuleMap;			// map of double,MetaRule - sorted DESCENDING to get higher-weight rules first
 
@@ -40,7 +40,7 @@ public:
 		m_testName = "diagnostics";
 		m_friendlyName = "Diagnostics";
 
-		m_rules.insert(make_pair(	.7,	new MiddleWareFilesIntegrityRule()));	// are middleware files all present and intact?
+//		m_rules.insert(make_pair(	.7,	new MiddleWareFilesIntegrityRule()));	// are middleware files all present and intact?
 #ifdef WIN32
 		m_rules.insert(make_pair(	.5,	new HPProtectToolsRule()));				// HP ProtectTools ("ActivCard") running?
 		m_rules.insert(make_pair(	.3,	new WinSCardDllLocksRule()));			// winscard.dll locked by unexpected processes?
