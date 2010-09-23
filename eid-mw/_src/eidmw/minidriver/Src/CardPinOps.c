@@ -262,11 +262,11 @@ DWORD WINAPI   CardAuthenticateEx
          LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [ppbSessionPin][pcbSessionPin]");
          CLEANUP(SCARD_E_INVALID_PARAMETER);
       }
-      else
+/*      else
       {
          LogTrace(LOGTYPE_ERROR, WHERE, "Not supported. [dwFlags]=[0x%X]", dwFlags);
          CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
-      }
+      }*/
    }
 
    /*
