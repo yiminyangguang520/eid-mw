@@ -169,71 +169,92 @@ DWORD WINAPI   CardReadFile
       LogTrace(LOGTYPE_INFO, WHERE, "pszFileName = [%s]", pszFileName);
    }
 
-   /*
-    * Read file from Virtual File List 
-    */
-   pCardItem = GetCardListItem(pCardData);
-   if ( pCardItem == NULL )
+   if ( pszDirectoryName == NULL &&                               /* root */
+	    _stricmp(szCARD_IDENTIFIER_FILE, pszFileName) == 0)       /* cardid */
    {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Card context and handle not Found...");
-      CLEANUP(SCARD_E_UNEXPECTED);
+       *ppbData = (LPVOID)pCardData->pfnCspAlloc(sizeof(GUID));
+       if ( *ppbData == NULL )
+       {
+          LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
+          CLEANUP(SCARD_E_NO_MEMORY);
+       }
+	   CardGetProperty(pCardData, 
+		   CP_CARD_GUID, 
+		   *ppbData, 
+		   sizeof(GUID),
+		   pcbData,
+		   0);
+	        
+       LogTrace(LOGTYPE_INFO, WHERE, "#bytes: [%d]", *pcbData);
    }
-
-   for ( i = 1 ; i <= ITEM_CNT(&pCardItem->ObjectList) ; i++)
+   else
    {
-      Goto_item_in_list(&pCardItem->ObjectList, i);
-      pObjectItem = (POBJECT_LIST_TYPE) CURR_PTR(&pCardItem->ObjectList);
+	   /*
+		* Read file from Virtual File List 
+		* -- to be removed --
+		*/
+	   pCardItem = GetCardListItem(pCardData);
+	   if ( pCardItem == NULL )
+	   {
+		  LogTrace(LOGTYPE_ERROR, WHERE, "Card context and handle not Found...");
+		  CLEANUP(SCARD_E_UNEXPECTED);
+	   }
 
-      if ( ( ( pszDirectoryName == NULL ) && ( pObjectItem->szDirectoryName[0]                          == '\0' ) ) ||
-           ( ( pszDirectoryName != NULL ) && ( _stricmp(pszDirectoryName, pObjectItem->szDirectoryName) == 0    ) ) )
-      {
-         DirFound++;
+	   for ( i = 1 ; i <= ITEM_CNT(&pCardItem->ObjectList) ; i++)
+	   {
+		  Goto_item_in_list(&pCardItem->ObjectList, i);
+		  pObjectItem = (POBJECT_LIST_TYPE) CURR_PTR(&pCardItem->ObjectList);
 
-         if ( _stricmp(pObjectItem->szFileName, pszFileName) == 0 )
-         {
-            /* Found file */
-            FileFound++;
-            break;
-         }
-      }
-   }
+		  if ( ( ( pszDirectoryName == NULL ) && ( pObjectItem->szDirectoryName[0]                          == '\0' ) ) ||
+			   ( ( pszDirectoryName != NULL ) && ( _stricmp(pszDirectoryName, pObjectItem->szDirectoryName) == 0    ) ) )
+		  {
+			 DirFound++;
 
-   if ( ! FileFound )
-   {
-      if ( ! DirFound )
-      {
-         LogTrace(LOGTYPE_ERROR, WHERE, "Dir not found");
-         CLEANUP(SCARD_E_DIR_NOT_FOUND);
-      }
-      else
-      {
-         LogTrace(LOGTYPE_ERROR, WHERE, "File not found");
-         CLEANUP(SCARD_E_FILE_NOT_FOUND);
-      }
-   }
+			 if ( _stricmp(pObjectItem->szFileName, pszFileName) == 0 )
+			 {
+				/* Found file */
+				FileFound++;
+				break;
+			 }
+		  }
+	   }
+
+	   if ( ! FileFound )
+	   {
+		  if ( ! DirFound )
+		  {
+			 LogTrace(LOGTYPE_ERROR, WHERE, "Dir not found");
+			 CLEANUP(SCARD_E_DIR_NOT_FOUND);
+		  }
+		  else
+		  {
+			 LogTrace(LOGTYPE_ERROR, WHERE, "File not found");
+			 CLEANUP(SCARD_E_FILE_NOT_FOUND);
+		  }
+	   }
    
-   if ( ( _stricmp(pObjectItem->szFileName, "msroots") == 0 ) &&
-        ( pObjectItem->ObjectDataSize                  == 0 ) )
-   {
-      dwReturn = BeidCreateMSRoots(pCardData, &(pObjectItem->ObjectDataSize), (PBYTE *)&(pObjectItem->pObjectData));
-      if ( dwReturn != SCARD_S_SUCCESS )
-      {
-         LogTrace(LOGTYPE_ERROR, WHERE, "BeidCreateMSRoots returned [%d]", dwReturn);
-         CLEANUP(SCARD_E_UNEXPECTED);
-      }
+	   if ( ( _stricmp(pObjectItem->szFileName, "msroots") == 0 ) &&
+			( pObjectItem->ObjectDataSize                  == 0 ) )
+	   {
+		  dwReturn = BeidCreateMSRoots(pCardData, &(pObjectItem->ObjectDataSize), (PBYTE *)&(pObjectItem->pObjectData));
+		  if ( dwReturn != SCARD_S_SUCCESS )
+		  {
+			 LogTrace(LOGTYPE_ERROR, WHERE, "BeidCreateMSRoots returned [%d]", dwReturn);
+			 CLEANUP(SCARD_E_UNEXPECTED);
+		  }
+	   }
+
+	   *pcbData = pObjectItem->ObjectDataSize;
+	   *ppbData = (LPVOID)pCardData->pfnCspAlloc(pObjectItem->ObjectDataSize);
+	   if ( *ppbData == NULL )
+	   {
+		  LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
+		  CLEANUP(SCARD_E_NO_MEMORY);
+	   }
+	   memcpy (*ppbData, pObjectItem->pObjectData, pObjectItem->ObjectDataSize);
+
+	   LogTrace(LOGTYPE_INFO, WHERE, "#bytes: [%d]", pObjectItem->ObjectDataSize);
    }
-
-   *pcbData = pObjectItem->ObjectDataSize;
-   *ppbData = (LPVOID)pCardData->pfnCspAlloc(pObjectItem->ObjectDataSize);
-   if ( *ppbData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
-      CLEANUP(SCARD_E_NO_MEMORY);
-   }
-   memcpy (*ppbData, pObjectItem->pObjectData, pObjectItem->ObjectDataSize);
-
-   LogTrace(LOGTYPE_INFO, WHERE, "#bytes: [%d]", pObjectItem->ObjectDataSize);
-
 #ifdef _DEBUG
    LogDump (*pcbData, (char *)*ppbData);
 #endif

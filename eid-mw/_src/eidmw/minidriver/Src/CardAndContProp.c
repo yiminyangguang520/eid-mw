@@ -217,7 +217,7 @@ cleanup:
 //
 
 #define WHERE "CardGetFreeSpace"
-DWORD CardGetFreeSpace(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetFreeSpace(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD                   dwReturn    = 0;
    CARD_FREE_SPACE_INFO    SpaceInfo;
@@ -252,7 +252,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetFreeSpace"
-DWORD CardSetFreeSpace(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetFreeSpace(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -268,7 +268,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetCapabilities"
-DWORD CardGetCapabilities(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetCapabilities(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD             dwReturn    = 0;
    CARD_CAPABILITIES CardCap;
@@ -302,7 +302,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetCapabilities"
-DWORD CardSetCapabilities(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetCapabilities(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -318,7 +318,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetKeysizes"
-DWORD CardGetKeysizes(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetKeysizes(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD             dwReturn  = 0;
 
@@ -376,7 +376,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetKeysizes"
-DWORD CardSetKeysizes(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetKeysizes(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -392,7 +392,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetReadOnly"
-DWORD CardGetReadOnly(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetReadOnly(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn    = 0;
    BOOL     bReadOnly   = TRUE;
@@ -422,7 +422,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetReadOnly"
-DWORD CardSetReadOnly(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetReadOnly(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -438,7 +438,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetCacheMode"
-DWORD CardGetCacheMode(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetCacheMode(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn    = 0;
    DWORD    dwCacheMode = CP_CACHE_MODE_NO_CACHE;
@@ -468,7 +468,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetCacheMode"
-DWORD CardSetCacheMode(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetCacheMode(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -484,7 +484,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetSupportsWinX509Enrollment"
-DWORD CardGetSupportsWinX509Enrollment(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetSupportsWinX509Enrollment(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
    BOOL     bSupportEnroll = FALSE;
@@ -514,7 +514,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetSupportsWinX509Enrollment"
-DWORD CardSetSupportsWinX509Enrollment(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetSupportsWinX509Enrollment(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -530,13 +530,10 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetGuid"
-DWORD CardGetGuid(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetGuid(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD                   dwReturn         = 0;
-   int                     Found            = 0;
-   int                     i                = 0;
-   POBJECT_LIST_TYPE       pObjectItem      = NULL;
-   
+   char                    szGUID[16];
    LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_GUID]");
 
    if ( dwFlags != 0 )
@@ -544,36 +541,30 @@ DWORD CardGetGuid(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWO
       LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
       CLEANUP(SCARD_E_INVALID_PARAMETER);
    }
-
-   /* Find cardid in card Object List */
-   for ( i = 1 ; i <= ITEM_CNT(&pCurrentCard->ObjectList) ; i++)
+   if ( cbData < sizeof(GUID) )
    {
-      Goto_item_in_list(&pCurrentCard->ObjectList, i);
-      pObjectItem = (POBJECT_LIST_TYPE) CURR_PTR(&pCurrentCard->ObjectList);
-      if ( strcmp(pObjectItem->szFileName, szCARD_IDENTIFIER_FILE) == 0 )
-      {
-         /* Found cardid file */
-         Found++;
-         break;
-      }
-   }
-
-   if ( !Found )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "cardid not found in Virtual File List");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-
-   if ( cbData < pObjectItem->ObjectDataSize )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer [%d][%d]", cbData, pObjectItem->ObjectDataSize);
+      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer [%d][%d]", cbData, sizeof(GUID));
       CLEANUP(ERROR_INSUFFICIENT_BUFFER);
    }
 
-   LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pObjectItem->ObjectDataSize);
+   // We should be consistent in returning the same cardid/guid during the session, so we 
+   // keep the GUID value in pCardData->pvVendorSpecific
+   if (pCardData->pvVendorSpecific == NULL) 
+   {
+	   // cardid/guid not set
+       pCardData->pvVendorSpecific = pCardData->pfnCspAlloc(sizeof(GUID));
+	   if ( pCardData->pvVendorSpecific == NULL )
+	   {
+          LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pCardData->pvVendorSpecific][GUID]");
+          CLEANUP(SCARD_E_NO_MEMORY);
+       }
+	   CoCreateGuid((GUID*)pCardData->pvVendorSpecific);
+   }
 
-   memcpy (pbData, pObjectItem->pObjectData, pObjectItem->ObjectDataSize);
-   *pdwDataLen = pObjectItem->ObjectDataSize;
+   LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pCardData->pvVendorSpecific);
+
+   memcpy (pbData, pCardData->pvVendorSpecific, sizeof(GUID));
+   *pdwDataLen = sizeof(GUID);
 
 cleanup:
 
@@ -584,7 +575,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetGuid"
-DWORD CardSetGuid(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetGuid(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -600,7 +591,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetSerialNo"
-DWORD CardGetSerialNo(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetSerialNo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn    = 0;
 
@@ -620,7 +611,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetSerialNo"
-DWORD CardSetSerialNo(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetSerialNo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -636,7 +627,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinInfo"
-DWORD CardGetPinInfo(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinInfo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD             dwReturn    = 0;
 
@@ -674,7 +665,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinInfo"
-DWORD CardSetPinInfo(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinInfo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -690,7 +681,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetListPins"
-DWORD CardGetListPins(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetListPins(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn    = 0;
    DWORD    dwPinSet    = 0;
@@ -725,7 +716,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetListPins"
-DWORD CardSetListPins(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetListPins(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -741,7 +732,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetAuthenticatedState"
-DWORD CardGetAuthenticatedState(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetAuthenticatedState(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -761,7 +752,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetAuthenticatedState"
-DWORD CardSetAuthenticatedState(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetAuthenticatedState(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -777,7 +768,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinStrengthVerify"
-DWORD CardGetPinStrengthVerify(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinStrengthVerify(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn      = 0;
    DWORD    dwPinStrength = CARD_PIN_STRENGTH_PLAINTEXT;
@@ -815,7 +806,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinStrengthVerify"
-DWORD CardSetPinStrengthVerify(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinStrengthVerify(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -831,7 +822,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinStrengthChange"
-DWORD CardGetPinStrengthChange(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinStrengthChange(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -847,7 +838,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinStrengthChange"
-DWORD CardSetPinStrengthChange(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinStrengthChange(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD dwReturn = 0;
 
@@ -863,7 +854,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinStrengthUnblock"
-DWORD CardGetPinStrengthUnblock(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinStrengthUnblock(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -879,7 +870,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinStrengthUnblock"
-DWORD CardSetPinStrengthUnblock(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinStrengthUnblock(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD dwReturn = 0;
 
@@ -895,7 +886,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetParentWindow"
-DWORD CardGetParentWindow(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetParentWindow(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -911,7 +902,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetParentWindow"
-DWORD CardSetParentWindow(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetParentWindow(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD dwReturn   = 0;
    HWND  hWinHandle = 0;
@@ -953,7 +944,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinContextString"
-DWORD CardGetPinContextString(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinContextString(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn       = 0;
 
@@ -969,7 +960,7 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinContextString"
-DWORD CardSetPinContextString(PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinContextString(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
    DWORD dwReturn = 0;
 
@@ -993,8 +984,8 @@ cleanup:
 typedef struct CardPropertyFnct
 {
    LPWSTR   wszProperty;
-   DWORD    (*GetFnct)(PCARD_LIST_TYPE, PBYTE, DWORD, PDWORD, DWORD);
-   DWORD    (*SetFnct)(PCARD_LIST_TYPE, PBYTE, DWORD, DWORD);
+   DWORD    (*GetFnct)(PCARD_DATA, PCARD_LIST_TYPE, PBYTE, DWORD, PDWORD, DWORD);
+   DWORD    (*SetFnct)(PCARD_DATA, PCARD_LIST_TYPE, PBYTE, DWORD, DWORD);
 } CardPropertyFnct;
 
 CardPropertyFnct PropFnct [] = 
@@ -1035,7 +1026,7 @@ DWORD WINAPI   CardGetProperty
    int               i              = 0;
 
    PCARD_LIST_TYPE   pCurrentCard   = NULL;
-
+   
    LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
 
    /********************/
@@ -1054,6 +1045,9 @@ DWORD WINAPI   CardGetProperty
    if ( pbData == NULL )
    {
       LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pbData]");
+	  printf("brrr\n");
+	  printf("brrr\n");
+	  printf("brrr\n");
       CLEANUP(SCARD_E_INVALID_PARAMETER);
    }
    if ( pdwDataLen == NULL )
@@ -1074,7 +1068,7 @@ DWORD WINAPI   CardGetProperty
    {
       if ( wcscmp(wszProperty, PropFnct[i].wszProperty) == 0 ) 
       {
-         dwReturn = (*PropFnct[i].GetFnct)(pCurrentCard, pbData, cbData, pdwDataLen, dwFlags);
+         dwReturn = (*PropFnct[i].GetFnct)(pCardData, pCurrentCard, pbData, cbData, pdwDataLen, dwFlags);
          break;
       }
       i++;
@@ -1147,7 +1141,7 @@ DWORD WINAPI   CardSetProperty
    {
       if ( wcscmp(wszProperty, PropFnct[i].wszProperty) == 0 ) 
       {
-         dwReturn = (*PropFnct[i].SetFnct)(pCurrentCard, pbData, cbDataLen, dwFlags);
+         dwReturn = (*PropFnct[i].SetFnct)(pCardData, pCurrentCard, pbData, cbDataLen, dwFlags);
          break;
       }
       i++;
