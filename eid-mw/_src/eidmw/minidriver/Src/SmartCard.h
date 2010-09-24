@@ -137,6 +137,7 @@ extern DWORD   BeidChangePIN
                   PDWORD         pcAttemptsRemaining
                );
 
+extern DWORD  BeidSelectApplet(PCARD_DATA     pCardData);
 
 extern DWORD CCIDfindFeature
 				(
