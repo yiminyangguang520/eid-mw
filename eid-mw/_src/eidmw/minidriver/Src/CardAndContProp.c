@@ -441,7 +441,7 @@ cleanup:
 DWORD CardGetCacheMode(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD    dwReturn    = 0;
-   DWORD    dwCacheMode = CP_CACHE_MODE_NO_CACHE;
+   DWORD    dwCacheMode = CP_CACHE_MODE_SESSION_ONLY;// CP_CACHE_MODE_NO_CACHE;
 
    LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_CACHE_MODE]");
 
@@ -533,7 +533,6 @@ cleanup:
 DWORD CardGetGuid(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
    DWORD                   dwReturn         = 0;
-   char                    szGUID[16];
    LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_GUID]");
 
    if ( dwFlags != 0 )
@@ -547,24 +546,19 @@ DWORD CardGetGuid(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbDa
       CLEANUP(ERROR_INSUFFICIENT_BUFFER);
    }
 
-   // We should be consistent in returning the same cardid/guid during the session, so we 
-   // keep the GUID value in pCardData->pvVendorSpecific
-   if (pCardData->pvVendorSpecific == NULL) 
+   dwReturn = CardGetProperty(pCardData, 
+			   CP_CARD_SERIAL_NO, 
+			   pbData, 
+			   cbData,
+			   pdwDataLen,
+			   0);
+   if (dwReturn != SCARD_S_SUCCESS)  
    {
-	   // cardid/guid not set
-       pCardData->pvVendorSpecific = pCardData->pfnCspAlloc(sizeof(GUID));
-	   if ( pCardData->pvVendorSpecific == NULL )
-	   {
-          LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pCardData->pvVendorSpecific][GUID]");
-          CLEANUP(SCARD_E_NO_MEMORY);
-       }
-	   CoCreateGuid((GUID*)pCardData->pvVendorSpecific);
+	   LogTrace(LOGTYPE_ERROR, WHERE, "Error CardGetProperty for [CP_CARD_SERIAL_NO]: 0x08X", dwReturn);
+	   CLEANUP(dwReturn);
    }
-
+	
    LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pCardData->pvVendorSpecific);
-
-   memcpy (pbData, pCardData->pvVendorSpecific, sizeof(GUID));
-   *pdwDataLen = sizeof(GUID);
 
 cleanup:
 
@@ -596,13 +590,36 @@ DWORD CardGetSerialNo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE 
    DWORD    dwReturn    = 0;
 
    LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_SERIAL_NO]");
+   if (cbData < 16) 
+   {
+	   CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+   }
+   // For further reference
+   // we keep the serial number in pCardData->pvVendorSpecific
+   if (pCardData->pvVendorSpecific == NULL) 
+   {
+	   // serial number not set
+       pCardData->pvVendorSpecific = pCardData->pfnCspAlloc(16);
+	   if ( pCardData->pvVendorSpecific == NULL )
+	   {
+          LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pCardData->pvVendorSpecific][GUID]");
+          CLEANUP(SCARD_E_NO_MEMORY);
+       }
 
-   /*
-    * certification changed on 22/07/2008
-	* Must return SCARD_E_INVALID_PARAMETER instead of SCARD_E_UNSUPPORTED_FEATURE
-	*/
-   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	   dwReturn = BeidGetCardSN(pCardData, pCardData->pvVendorSpecific, 16, pdwDataLen);
+	   if ( dwReturn != SCARD_S_SUCCESS )
+       {
+			LogTrace(LOGTYPE_ERROR, WHERE, "BeidGetCardSN returned [%d]", dwReturn);
+			CLEANUP(SCARD_E_UNEXPECTED);
+	   }	   
+   }
+   else 
+   {
+	   *pdwDataLen = 16;
+   }
 
+   LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pCardData->pvVendorSpecific);
+   memcpy (pbData, pCardData->pvVendorSpecific, 16);
 cleanup:
    return(dwReturn);
 }

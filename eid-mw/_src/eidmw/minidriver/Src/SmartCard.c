@@ -751,7 +751,10 @@ cleanup:
 /****************************************************************************************************/
 
 #define WHERE "BeidGetCardSN"
-DWORD BeidGetCardSN(PCARD_DATA  pCardData, unsigned int iSerNumLg, unsigned char *pa_cSerNum) 
+DWORD BeidGetCardSN(PCARD_DATA  pCardData, 
+					PBYTE pbSerialNumber, 
+					DWORD cbSerialNumber, 
+					PDWORD pdwSerialNumber) 
 {
    DWORD                   dwReturn = 0;
 
@@ -768,6 +771,12 @@ DWORD BeidGetCardSN(PCARD_DATA  pCardData, unsigned int iSerNumLg, unsigned char
    int                     i = 0;
    int                     iWaitApdu = 100;
    BOOL   				   bRetry = false;
+
+   if (cbSerialNumber < 16) {
+	   CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+   }
+
+   *pdwSerialNumber = 0;
 
    Cmd [0] = 0x80;
    Cmd [1] = 0xE4;
@@ -799,8 +808,6 @@ DWORD BeidGetCardSN(PCARD_DATA  pCardData, unsigned int iSerNumLg, unsigned char
 			SW1 = recvbuf[recvlen-2];
 			SW2 = recvbuf[recvlen-1];
 			// 6d = "command not available in current life cycle"
-			// as GET CARD DATA is known by the eid, this means
-			// the card became unresponsive. 
 			if ( SW1 == 0x6d )
 			{
 			    LogTrace(LOGTYPE_TRACE, WHERE, "SCardTransmit returned SW1 = 6d. Sleep %d ms and try again", iWaitApdu);
@@ -822,12 +829,8 @@ DWORD BeidGetCardSN(PCARD_DATA  pCardData, unsigned int iSerNumLg, unsigned char
       LogTrace(LOGTYPE_ERROR, WHERE, "Bad status bytes: [0x%02X][0x%02X]", SW1, SW2);
 	  CLEANUP(SCARD_E_UNEXPECTED);
    }
-
-   memset(pa_cSerNum, '\0', iSerNumLg);
-   for ( i = 0 ; i < 16 ; i++ )
-   {
-      sprintf (pa_cSerNum + 2*i, "%02X", recvbuf[i]);
-   }
+   *pdwSerialNumber = 16;
+   memcpy(pbSerialNumber, recvbuf, 16);
 
 cleanup:
    return (dwReturn);

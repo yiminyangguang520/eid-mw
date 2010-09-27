@@ -75,11 +75,12 @@ typedef struct _FEATURES
 } FEATURES, *PFEATURES;
 
 extern DWORD BeidGetCardSN
-			(
-			   PCARD_DATA  pCardData, 
-			   unsigned int iSerNumLg, 
-			   unsigned char *pa_cSerNum
-			);
+	(
+		PCARD_DATA  pCardData, 
+		PBYTE pbSerialNumber, 
+		DWORD cbSerialNumber, 
+		PDWORD pdwSerialNumber
+	);
 extern DWORD BeidSignData
 			(
 				PCARD_DATA  pCardData, 

@@ -21,6 +21,7 @@
 
 #include "Log.h"
 #include "util.h"
+#include "SmartCard.h"
 
 /****************************************************************************************************/
 
@@ -112,8 +113,17 @@ DWORD WINAPI   CardReadFile
    int                  FileFound   = 0;
    PCARD_LIST_TYPE      pCardItem   = NULL;
    POBJECT_LIST_TYPE    pObjectItem = NULL;
+   int					iUseOldCache = 0;
+   CONTAINER_MAP_RECORD cmr[2];
+   BYTE                 pbSerialNumber[16];
+   DWORD				cbSerialNumber = sizeof(pbSerialNumber);
+   DWORD				cbDataLen;
+   char					szSerialNumber[33];
+   char					szContainerName[64];
+   int					iReturn;
 
    LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
+
 
    /********************/
    /* Check Parameters */
@@ -172,22 +182,167 @@ DWORD WINAPI   CardReadFile
    if ( pszDirectoryName == NULL &&                               /* root */
 	    _stricmp(szCARD_IDENTIFIER_FILE, pszFileName) == 0)       /* cardid */
    {
-       *ppbData = (LPVOID)pCardData->pfnCspAlloc(sizeof(GUID));
+       iUseOldCache++;     
+	   *ppbData = (PBYTE)pCardData->pfnCspAlloc(sizeof(GUID));
        if ( *ppbData == NULL )
        {
           LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
           CLEANUP(SCARD_E_NO_MEMORY);
        }
-	   CardGetProperty(pCardData, 
+	   dwReturn = CardGetProperty(pCardData, 
 		   CP_CARD_GUID, 
 		   *ppbData, 
 		   sizeof(GUID),
 		   pcbData,
 		   0);
-	        
+	   if (dwReturn != SCARD_S_SUCCESS)  {
+          LogTrace(LOGTYPE_ERROR, WHERE, "Error CardGetProperty for [CP_CARD_GUID]: 0x08X", dwReturn);
+          CLEANUP(dwReturn);
+	   }
+
        LogTrace(LOGTYPE_INFO, WHERE, "#bytes: [%d]", *pcbData);
+   } 
+   
+   if ( pszDirectoryName == NULL &&                               /* root */
+	    _stricmp("cardapps", pszFileName) == 0)					  /* cardapps */
+   {
+		iUseOldCache++;
+		*pcbData = 5;
+		*ppbData = (PBYTE)pCardData->pfnCspAlloc(*pcbData);
+        if ( *ppbData == NULL )
+        {
+           LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
+           CLEANUP(SCARD_E_NO_MEMORY);
+        }
+	    memcpy (*ppbData, "mscp", *pcbData);
    }
-   else
+
+   if ( pszDirectoryName == NULL &&                               /* root */
+	    _stricmp("cardcf", pszFileName) == 0)					  /* cardcf */
+   {
+		iUseOldCache++;
+		*pcbData = 6;
+		*ppbData = (PBYTE)pCardData->pfnCspAlloc(*pcbData);
+        if ( *ppbData == NULL )
+        {
+           LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
+           CLEANUP(SCARD_E_NO_MEMORY);
+        }
+		// zero-filled CARD_CACHE_FILE_FORMAT
+	    memset (*ppbData, '\0', *pcbData);
+   }
+   
+   if ( pszDirectoryName != NULL)									  /* not on root */
+   {
+	   if ( _stricmp("mscp", pszDirectoryName) == 0  &&               /* mscp */
+			_stricmp("cmapfile", pszFileName) == 0)					  /* cmapfile */
+	   {
+			iUseOldCache++;
+			*pcbData = sizeof(cmr);
+			*ppbData = (PBYTE)pCardData->pfnCspAlloc(*pcbData);
+			if ( *ppbData == NULL )
+			{
+			   LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
+			   CLEANUP(SCARD_E_NO_MEMORY);
+			}
+			dwReturn = CardGetProperty(pCardData, 
+			   CP_CARD_SERIAL_NO, 
+			   pbSerialNumber, 
+			   cbSerialNumber,
+			   &cbDataLen,
+			   0);
+	   		if (dwReturn != SCARD_S_SUCCESS)  {
+			  LogTrace(LOGTYPE_ERROR, WHERE, "Error CardGetProperty for [CP_CARD_SERIAL_NO]: 0x08X", dwReturn);
+			  CLEANUP(dwReturn);
+			}
+			for (i=0; i < 16; i++) {
+				sprintf(szSerialNumber + 2*i*sizeof(char),
+					"%02X", pbSerialNumber[i]);
+			}
+			szSerialNumber[32] = '\0';
+
+			/* Cleanup CMR first */
+			memset(&cmr, '\0', sizeof(cmr));
+		
+			/***************************/
+			/* Authentication Key Info */
+			/***************************/
+			/* Container name for Authentication key */
+			sprintf (szContainerName, "DS_%s", szSerialNumber);
+			memset(cmr[0].wszGuid, '\0', sizeof(cmr[0].wszGuid));
+			iReturn = MultiByteToWideChar(CP_UTF8, 0, szContainerName, strlen(szContainerName), cmr[0].wszGuid, sizeof(cmr[0].wszGuid));
+
+			if (iReturn == 0) 
+			{
+				dwReturn = GetLastError();
+				LogTrace(LOGTYPE_ERROR, WHERE, "Error MultiByteToWideChar: 0x08X", dwReturn);
+				CLEANUP(dwReturn);
+			}
+			cmr[0].bFlags                     = CONTAINER_MAP_VALID_CONTAINER|CONTAINER_MAP_DEFAULT_CONTAINER;
+			cmr[0].bReserved                  = 0;
+			cmr[0].wSigKeySizeBits            = 1024;
+			cmr[0].wKeyExchangeKeySizeBits    = 0;
+
+			/****************************/
+			/* Non-Repudiation Key Info */
+			/****************************/
+			/* Container name for Non-repudiation key */
+			sprintf (szContainerName, "NR_%s", szSerialNumber);
+			memset(cmr[1].wszGuid, '\0', sizeof(cmr[1].wszGuid));
+			iReturn = MultiByteToWideChar(CP_UTF8, 0, szContainerName, strlen(szContainerName), cmr[1].wszGuid, sizeof(cmr[1].wszGuid));
+
+			if (iReturn == 0) 
+			{
+				dwReturn = GetLastError();
+				LogTrace(LOGTYPE_ERROR, WHERE, "Error MultiByteToWideChar: 0x08X", dwReturn);
+				CLEANUP(dwReturn);
+			}
+			cmr[1].bFlags                     = CONTAINER_MAP_VALID_CONTAINER;
+			cmr[1].bReserved                  = 0;
+			cmr[1].wSigKeySizeBits            = 1024;
+			cmr[1].wKeyExchangeKeySizeBits    = 0;
+			memcpy (*ppbData, &cmr, *pcbData);
+	   }
+	   if ( _stricmp("mscp", pszDirectoryName) == 0  &&               /* mscp */
+			_stricmp("ksc00", pszFileName) == 0)					  /* ksc00 */
+	   {
+			iUseOldCache++;
+			dwReturn = BeidReadCert(pCardData, CERT_AUTH, pcbData, ppbData);
+			if ( dwReturn != SCARD_S_SUCCESS )
+			{
+				LogTrace(LOGTYPE_ERROR, WHERE, "BeidReadCert[CERT_AUTH] returned [%d]", dwReturn);
+				CLEANUP(SCARD_E_UNEXPECTED);
+			}
+	   }
+	   if ( _stricmp("mscp", pszDirectoryName) == 0  &&               /* mscp */
+			_stricmp("ksc01", pszFileName) == 0)					  /* ksc01 */
+	   {
+			iUseOldCache++;
+			dwReturn = BeidReadCert(pCardData, CERT_NONREP, pcbData, ppbData);
+			if ( dwReturn != SCARD_S_SUCCESS )
+			{
+				LogTrace(LOGTYPE_ERROR, WHERE, "BeidReadCert[CERT_NONREP] returned [%d]", dwReturn);
+				CLEANUP(SCARD_E_UNEXPECTED);
+			}
+	   }
+	   if ( _stricmp("mscp", pszDirectoryName) == 0  &&               /* mscp */
+			_stricmp("msroots", pszFileName) == 0)					  /* msroots */
+	   {
+			iUseOldCache++;
+		    dwReturn = BeidCreateMSRoots(pCardData, pcbData, ppbData);
+		    if ( dwReturn != SCARD_S_SUCCESS )
+		    {
+			   LogTrace(LOGTYPE_ERROR, WHERE, "BeidCreateMSRoots returned [%d]", dwReturn);
+			   CLEANUP(SCARD_E_UNEXPECTED);
+		    }
+			if ( *ppbData == NULL )
+			{
+				LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
+				CLEANUP(SCARD_E_NO_MEMORY);
+			}
+	   }
+   }
+   if (iUseOldCache == 0)
    {
 	   /*
 		* Read file from Virtual File List 
@@ -233,25 +388,7 @@ DWORD WINAPI   CardReadFile
 		  }
 	   }
    
-	   if ( ( _stricmp(pObjectItem->szFileName, "msroots") == 0 ) &&
-			( pObjectItem->ObjectDataSize                  == 0 ) )
-	   {
-		  dwReturn = BeidCreateMSRoots(pCardData, &(pObjectItem->ObjectDataSize), (PBYTE *)&(pObjectItem->pObjectData));
-		  if ( dwReturn != SCARD_S_SUCCESS )
-		  {
-			 LogTrace(LOGTYPE_ERROR, WHERE, "BeidCreateMSRoots returned [%d]", dwReturn);
-			 CLEANUP(SCARD_E_UNEXPECTED);
-		  }
-	   }
 
-	   *pcbData = pObjectItem->ObjectDataSize;
-	   *ppbData = (LPVOID)pCardData->pfnCspAlloc(pObjectItem->ObjectDataSize);
-	   if ( *ppbData == NULL )
-	   {
-		  LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [*ppbData]");
-		  CLEANUP(SCARD_E_NO_MEMORY);
-	   }
-	   memcpy (*ppbData, pObjectItem->pObjectData, pObjectItem->ObjectDataSize);
 
 	   LogTrace(LOGTYPE_INFO, WHERE, "#bytes: [%d]", pObjectItem->ObjectDataSize);
    }

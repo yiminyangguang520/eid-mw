@@ -225,10 +225,8 @@ DWORD AddContextInList(PCARD_DATA pCardData)
 
    PIN_CACHE_POLICY     pinCachePolicy;
 
-   CONTAINER_MAP_RECORD cmr[2];
-   GUID                 guid  ;
-   unsigned char        a_ucSerNum  [64];
-   unsigned char        a_ucContName[64];
+   BYTE			        pbSerNum  [64];
+   DWORD				cbSerNum = sizeof(pbSerNum);
    int                  iOutLg = 0;
    FEATURES				CCIDfeatures;
 
@@ -319,148 +317,11 @@ DWORD AddContextInList(PCARD_DATA pCardData)
       pCardItem->ContainerInfo[i].ContainerInfo.cbKeyExPublicKey = 0;
    }
 
-   /*
-    * Card Identifier
-    */
-   LogTrace(LOGTYPE_INFO, WHERE, "Creating Card Identifier...");
-   pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
-   if ( pObjectItem == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Allocate_memory_for_list() Failed : CARD_LIST_TYPE");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-   pObjectItem->szDirectoryName[0] = '\0';
-   strcpy (pObjectItem->szFileName, szCARD_IDENTIFIER_FILE); /* cardid */
-   pObjectItem->bObjectType        = FILE_OBJECT_FILE_TYPE;
-   pObjectItem->bAccessCondition   = EveryoneReadAdminWriteAc;
-   /* The size of the GUID-structure is 16 bytes */
-   pObjectItem->ObjectDataSize     = sizeof(GUID);
-   pObjectItem->pObjectData        = pCardData->pfnCspAlloc(pObjectItem->ObjectDataSize);
-   if ( pObjectItem->pObjectData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pObjectItem->pObjectData][GUID]");
-      CLEANUP(SCARD_E_NO_MEMORY);
-   }
-
-   CoCreateGuid(&guid);
-   memcpy (pObjectItem->pObjectData, &guid, pObjectItem->ObjectDataSize);
-   Append_item_in_list (&pCardItem->ObjectList, (head_type *)pObjectItem);
-
-   /*
-    * Application Directory
-    */
-   LogTrace(LOGTYPE_INFO, WHERE, "Creating Application Directory...");
-   pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
-   if ( pObjectItem == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Allocate_memory_for_list() Failed : CARD_LIST_TYPE");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-   pObjectItem->szDirectoryName[0] = '\0';
-   strcpy (pObjectItem->szFileName, "cardapps");
-   pObjectItem->bObjectType        = FILE_OBJECT_FILE_TYPE;
-   pObjectItem->bAccessCondition   = EveryoneReadAdminWriteAc;
-   pObjectItem->ObjectDataSize     = 8;
-   pObjectItem->pObjectData        = pCardData->pfnCspAlloc(pObjectItem->ObjectDataSize); /* Name can be 8 bytes: no requirement of zero-termination */
-   if ( pObjectItem->pObjectData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pObjectItem->pObjectData][cardapps]");
-      CLEANUP(SCARD_E_NO_MEMORY);
-   }
-   strncpy (pObjectItem->pObjectData, szBASE_CSP_DIR, pObjectItem->ObjectDataSize);
-   Append_item_in_list (&pCardItem->ObjectList, (head_type *)pObjectItem);
-
-   /*
-    * Cache File           
-    */
-   LogTrace(LOGTYPE_INFO, WHERE, "Creating Cache File...");
-   pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
-   if ( pObjectItem == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Allocate_memory_for_list() Failed : CARD_LIST_TYPE");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-   pObjectItem->szDirectoryName[0] = '\0';
-   strcpy (pObjectItem->szFileName, szCACHE_FILE); /* cardcf */
-   pObjectItem->bObjectType        = FILE_OBJECT_FILE_TYPE;
-   pObjectItem->bAccessCondition   = EveryoneReadUserWriteAc;
-   pObjectItem->ObjectDataSize     = 6;
-   pObjectItem->pObjectData        = pCardData->pfnCspAlloc(pObjectItem->ObjectDataSize);
-   if ( pObjectItem->pObjectData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pObjectItem->pObjectData][cardcf]");
-      CLEANUP(SCARD_E_NO_MEMORY);
-   }
-
-   memset(pObjectItem->pObjectData, '\0', pObjectItem->ObjectDataSize);
-   Append_item_in_list (&pCardItem->ObjectList, (head_type *)pObjectItem);
-
-   /*
-    * Container Map File
-    */
-   LogTrace(LOGTYPE_INFO, WHERE, "Creating Map file...");
-   pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
-   if ( pObjectItem == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Allocate_memory_for_list() Failed : CARD_LIST_TYPE");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-   strcpy (pObjectItem->szDirectoryName, szBASE_CSP_DIR);       /* mscp     */
-   strcpy (pObjectItem->szFileName     , szCONTAINER_MAP_FILE); /* cmapfile */
-   pObjectItem->bObjectType        = FILE_OBJECT_FILE_TYPE;
-   pObjectItem->bAccessCondition   = EveryoneReadAdminWriteAc;
-   pObjectItem->ObjectDataSize     = sizeof(cmr);
-   pObjectItem->pObjectData        = pCardData->pfnCspAlloc(pObjectItem->ObjectDataSize);
-   if ( pObjectItem->pObjectData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pObjectItem->pObjectData][mscp]");
-      CLEANUP(SCARD_E_NO_MEMORY);
-   }
-
-   /***************************/
-   /* Authentication Key Info */
-   /***************************/
-
-   /* Use Card Serial Number as part of the container names */
-   dwReturn = BeidGetCardSN(pCardData, sizeof(a_ucSerNum), a_ucSerNum) ;
-   if ( dwReturn != SCARD_S_SUCCESS )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "BeidGetCardSN returned [%d]", dwReturn);
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-
-   /* Cleanup CMR first */
-   memset(&cmr, '\0', sizeof(cmr));
-
-   /* Container name for Authentication key */
-   sprintf (a_ucContName, "DS_%s", a_ucSerNum);
-   memset(cmr[0].wszGuid, '\0', sizeof(cmr[0].wszGuid));
-   iOutLg = MultiByteToWideChar(CP_UTF8, 0, a_ucContName, strlen(a_ucContName), cmr[0].wszGuid, sizeof(cmr[0].wszGuid));
-
-   cmr[0].bFlags                     = CONTAINER_MAP_VALID_CONTAINER|CONTAINER_MAP_DEFAULT_CONTAINER;
-   cmr[0].bReserved                  = 0;
-   cmr[0].wSigKeySizeBits            = 1024;
-   cmr[0].wKeyExchangeKeySizeBits    = 0;
-
-   /****************************/
-   /* Non-Repudiation Key Info */
-   /****************************/
-   /* Container name for Non-repudiation key */
-   sprintf (a_ucContName, "NR_%s", a_ucSerNum);
-   memset(cmr[1].wszGuid, '\0', sizeof(cmr[1].wszGuid));
-   iOutLg = MultiByteToWideChar(CP_UTF8, 0, a_ucContName, strlen(a_ucContName), cmr[1].wszGuid, sizeof(cmr[1].wszGuid));
-
-   cmr[1].bFlags                     = CONTAINER_MAP_VALID_CONTAINER;
-   cmr[1].bReserved                  = 0;
-   cmr[1].wSigKeySizeBits            = 1024;
-   cmr[1].wKeyExchangeKeySizeBits    = 0;
-   memcpy(pObjectItem->pObjectData, &cmr, pObjectItem->ObjectDataSize);
-   Append_item_in_list (&pCardItem->ObjectList, (head_type *)pObjectItem);
-
+ 
    /*
     * Authentication Certificate
     */
-   LogTrace(LOGTYPE_INFO, WHERE, "Creating Authentication Certif...");
+ /*  LogTrace(LOGTYPE_INFO, WHERE, "Creating Authentication Certif...");
    pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
    if ( pObjectItem == NULL )
    {
@@ -482,7 +343,7 @@ DWORD AddContextInList(PCARD_DATA pCardData)
 #ifdef _DEBUG
    LogDump (pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
    LogDumpBin ("C:\\SmartCardMinidriverTest\\auth.crt", pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
-#endif
+#endif*/
 
    /* 
     * Container Info
@@ -513,30 +374,30 @@ DWORD AddContextInList(PCARD_DATA pCardData)
    /*
     * Non-repudiation Certificate
     */
-   LogTrace(LOGTYPE_INFO, WHERE, "Creating Non-Repudiation Certif...");
-   pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
-   if ( pObjectItem == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Allocate_memory_for_list() Failed : CARD_LIST_TYPE");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-   strcpy (pObjectItem->szDirectoryName, szBASE_CSP_DIR);
-   strcpy (pObjectItem->szFileName, "ksc01");
-   pObjectItem->bObjectType        = FILE_OBJECT_FILE_TYPE;
-   pObjectItem->bAccessCondition   = EveryoneReadUserWriteAc;
-   dwReturn = BeidReadCert(pCardData, CERT_NONREP, &pObjectItem->ObjectDataSize, (PBYTE *)&pObjectItem->pObjectData);
-   if ( dwReturn != SCARD_S_SUCCESS )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "BeidReadCert[CERT_NONREP] returned [%d]", dwReturn);
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-   Append_item_in_list (&pCardItem->ObjectList, (head_type *)pObjectItem);
-
-#ifdef _DEBUG
-   LogDump (pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
-   LogDumpBin ("C:\\SmartCardMinidriverTest\\nonrep.crt", pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
-#endif
-
+//   LogTrace(LOGTYPE_INFO, WHERE, "Creating Non-Repudiation Certif...");
+//   pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
+//   if ( pObjectItem == NULL )
+//   {
+//      LogTrace(LOGTYPE_ERROR, WHERE, "Allocate_memory_for_list() Failed : CARD_LIST_TYPE");
+//      CLEANUP(SCARD_E_UNEXPECTED);
+//   }
+//   strcpy (pObjectItem->szDirectoryName, szBASE_CSP_DIR);
+//   strcpy (pObjectItem->szFileName, "ksc01");
+//   pObjectItem->bObjectType        = FILE_OBJECT_FILE_TYPE;
+//   pObjectItem->bAccessCondition   = EveryoneReadUserWriteAc;
+//   dwReturn = BeidReadCert(pCardData, CERT_NONREP, &pObjectItem->ObjectDataSize, (PBYTE *)&pObjectItem->pObjectData);
+//   if ( dwReturn != SCARD_S_SUCCESS )
+//   {
+//      LogTrace(LOGTYPE_ERROR, WHERE, "BeidReadCert[CERT_NONREP] returned [%d]", dwReturn);
+//      CLEANUP(SCARD_E_UNEXPECTED);
+//   }
+//   Append_item_in_list (&pCardItem->ObjectList, (head_type *)pObjectItem);
+//
+//#ifdef _DEBUG
+//   LogDump (pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
+//   LogDumpBin ("C:\\SmartCardMinidriverTest\\nonrep.crt", pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
+//#endif
+//
    /* 
     * Container Info
     */
@@ -559,28 +420,28 @@ DWORD AddContextInList(PCARD_DATA pCardData)
    //pCardItem->ContainerInfo[1].ContainerInfo.cbKeyExPublicKey = 0;
    //pCardItem->ContainerInfo[1].ContainerInfo.pbKeyExPublicKey = NULL;
 
-#ifdef _DEBUG
-   LogDumpBin("C:\\SmartCardMinidriverTest\\nonreppk.bin", pCardItem->ContainerInfo[1].ContainerInfo.cbSigPublicKey
-                                                         , (char *)pCardItem->ContainerInfo[1].ContainerInfo.pbSigPublicKey);
-#endif
+//#ifdef _DEBUG
+//   LogDumpBin("C:\\SmartCardMinidriverTest\\nonreppk.bin", pCardItem->ContainerInfo[1].ContainerInfo.cbSigPublicKey
+//                                                         , (char *)pCardItem->ContainerInfo[1].ContainerInfo.pbSigPublicKey);
+//#endif
 
    /*
     * MSROOTS
     */
-   LogTrace(LOGTYPE_INFO, WHERE, "Creating MSROOTS...");
-   pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
-   if ( pObjectItem == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Allocate_memory_for_list() Failed : CARD_LIST_TYPE");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-   strcpy (pObjectItem->szDirectoryName, szBASE_CSP_DIR);
-   strcpy (pObjectItem->szFileName, "msroots");
-   pObjectItem->bObjectType        = FILE_OBJECT_FILE_TYPE;
-   pObjectItem->bAccessCondition   = EveryoneReadUserWriteAc;
+   //LogTrace(LOGTYPE_INFO, WHERE, "Creating MSROOTS...");
+   //pObjectItem = (POBJECT_LIST_TYPE) Allocate_memory_for_list(sizeof(OBJECT_LIST_TYPE));
+   //if ( pObjectItem == NULL )
+   //{
+   //   LogTrace(LOGTYPE_ERROR, WHERE, "Allocate_memory_for_list() Failed : CARD_LIST_TYPE");
+   //   CLEANUP(SCARD_E_UNEXPECTED);
+   //}
+   //strcpy (pObjectItem->szDirectoryName, szBASE_CSP_DIR);
+   //strcpy (pObjectItem->szFileName, "msroots");
+   //pObjectItem->bObjectType        = FILE_OBJECT_FILE_TYPE;
+   //pObjectItem->bAccessCondition   = EveryoneReadUserWriteAc;
 
-   pObjectItem->ObjectDataSize = 0;
-   pObjectItem->pObjectData    = NULL;
+   //pObjectItem->ObjectDataSize = 0;
+   //pObjectItem->pObjectData    = NULL;
 
    /*
    dwReturn = BeidCreateMSRoots(pCardData, &(pObjectItem->ObjectDataSize), (PBYTE *)&(pObjectItem->pObjectData));
@@ -591,12 +452,12 @@ DWORD AddContextInList(PCARD_DATA pCardData)
    }
    */
 
-   Append_item_in_list (&pCardItem->ObjectList, (head_type *)pObjectItem);
+   //Append_item_in_list (&pCardItem->ObjectList, (head_type *)pObjectItem);
 
-#ifdef _DEBUG
-   LogDump (pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
-   LogDumpBin ("C:\\SmartCardMinidriverTest\\msroots.p7c", pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
-#endif
+//#ifdef _DEBUG
+//   LogDump (pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
+//   LogDumpBin ("C:\\SmartCardMinidriverTest\\msroots.p7c", pObjectItem->ObjectDataSize, (char *)pObjectItem->pObjectData);
+//#endif
 
    /**************************************************************************************************************************/
    /*                                          PIN Information                                                               */
@@ -635,7 +496,7 @@ DWORD AddContextInList(PCARD_DATA pCardData)
    memcpy (&(pCardItem->PinInfo[ROLE_DIGSIG].PinCachePolicy), &pinCachePolicy, sizeof(pinCachePolicy));
    pCardItem->PinInfo[ROLE_DIGSIG].dwFlags             = 0;
 
-   /* Pin Cach Policy */
+   /* Pin Cache Policy */
    pinCachePolicy.dwVersion            = PIN_CACHE_POLICY_CURRENT_VERSION;
    pinCachePolicy.PinCachePolicyType   = PinCacheNone;
    pinCachePolicy.dwPinCachePolicyInfo = 0;
