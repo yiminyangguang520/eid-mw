@@ -30,7 +30,9 @@
 
 /****************************************************************************************************/
 
-char           g_szLogFile[512]  = "C:\\SmartCardMinidriverTest\\AZEBEIDMDRV.LOG";
+#define MAX_LOG_FILE_NAME	512
+#define MAX_LOG_DIR_NAME	480
+char    g_szLogFile[MAX_LOG_FILE_NAME]  = "C:\\SmartCardMinidriverTest\\AZEBEIDMDRV.LOG";
 
 #ifdef _DEBUG
 unsigned int   g_uiLogLevel      = LOGTYPE_TRACE;
@@ -39,7 +41,76 @@ unsigned int   g_uiLogLevel      = LOGTYPE_NONE;
 #endif
 
 /****************************************************************************************************/
+void LogInit()
+{
+    DWORD         dwRet;
+    HKEY          hKey;
+    BYTE        lpData[MAX_LOG_DIR_NAME];
+    DWORD       dwData = 0; 
 
+    printf("\nRetrieving the data..."); 
+
+    dwRet = RegOpenKeyEx (HKEY_LOCAL_MACHINE, TEXT("Software\\BEID\\Logging"), 0, KEY_READ, &hKey);
+
+    if (dwRet != ERROR_SUCCESS) {
+      // Key not found - return, keep default values
+      return;
+    } 
+
+    // getting log_level
+    dwData = sizeof(lpData);
+    dwRet = RegQueryValueEx( hKey,
+                             TEXT("log_level"),
+                             NULL,
+                             NULL,
+                             (LPBYTE) lpData,
+                             &dwData );
+
+    if (dwRet == ERROR_SUCCESS) {
+      // log_level found
+      // Read loglevels from registry and map on beid middleware loglevels
+      // debug   -> LOGTYPE_TRACE
+      // info    -> LOGTYPE_INFO
+      // warning -> LOGTYPE_WARNING
+      // error   -> LOGTYPE_ERROR
+      // none    -> LOGTYPE_NONE
+
+		if (lstrcmp((LPTSTR)lpData,TEXT("debug")))
+			g_uiLogLevel = LOGTYPE_TRACE;
+		else if (lstrcmp((LPTSTR)lpData,TEXT("info")))
+			g_uiLogLevel = LOGTYPE_INFO;
+		else if (lstrcmp((LPTSTR)lpData,TEXT("warning")))
+			g_uiLogLevel = LOGTYPE_WARNING;
+		else if (lstrcmp((LPTSTR)lpData,TEXT("error")))
+			g_uiLogLevel = LOGTYPE_ERROR;
+		else if (lstrcmp((LPTSTR)lpData,TEXT("none")))
+			g_uiLogLevel = LOGTYPE_NONE;
+    }
+
+    //getting log_dirname
+    dwData = sizeof(lpData);
+    dwRet = RegQueryValueEx( hKey,
+                             TEXT("log_dirname"),
+                             NULL,
+                             NULL,
+                             (LPBYTE) lpData,
+                             &dwData );
+
+    if (dwRet == ERROR_SUCCESS && dwData != 0) {
+      // log_dirname found
+      // we are not sure the string is null-terminated
+		if (dwData == sizeof(lpData))
+			dwData--;//replace last character with \0
+
+      lpData[dwData] = '\0';
+      // put dirname in global var
+      lstrcpy(g_szLogFile, lpData);
+      // append file name
+      lstrcat(g_szLogFile, TEXT("\\beidmdrv.log"));
+    }
+}
+
+/*
 void LogInit (char *pszLogFile, unsigned int uiLogLevel)
 {
    if ( pszLogFile != NULL )
@@ -48,7 +119,7 @@ void LogInit (char *pszLogFile, unsigned int uiLogLevel)
    }
 
    g_uiLogLevel = uiLogLevel;
-}
+}*/
 
 /****************************************************************************************************/
 

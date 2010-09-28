@@ -43,7 +43,7 @@ BOOL WINAPI DllMain(HINSTANCE    hinstDLL,   // handle to DLL module
    case DLL_PROCESS_ATTACH:
       // Initialize once for each new process.
       // Return FALSE to fail DLL load.
-
+		LogInit();
 		DisableThreadLibraryCalls(hinstDLL);
       Init_list(&gContextCardList);
       
