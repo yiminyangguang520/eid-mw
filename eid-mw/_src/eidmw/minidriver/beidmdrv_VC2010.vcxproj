@@ -204,7 +204,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="Src\ListMgr.c" />
     <ClCompile Include="Src\Log.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -222,7 +221,6 @@
   <ItemGroup>
     <ClInclude Include="Src\ExternalPinUI.h" />
     <ClInclude Include="Inc\GlobMdrv.h" />
-    <ClInclude Include="Inc\ListMgr.h" />
     <ClInclude Include="Inc\Log.h" />
     <ClInclude Include="Src\SmartCard.h" />
     <ClInclude Include="Src\stdafx.h" />

@@ -1,20 +1,20 @@
 /* ****************************************************************************
 
- * eID Middleware Project.
- * Copyright (C) 2008-2009 FedICT.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License version
- * 3.0 as published by the Free Software Foundation.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, see
- * http://www.gnu.org/licenses/.
+* eID Middleware Project.
+* Copyright (C) 2008-2009 FedICT.
+*
+* This is free software; you can redistribute it and/or modify it
+* under the terms of the GNU Lesser General Public License version
+* 3.0 as published by the Free Software Foundation.
+*
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this software; if not, see
+* http://www.gnu.org/licenses/.
 
 **************************************************************************** */
 #include "GlobMdrv.h"
@@ -31,154 +31,140 @@
 
 #define WHERE "CardGetContainerProperty()"
 DWORD WINAPI   CardGetContainerProperty
-               (
-                  __in                                         PCARD_DATA     pCardData,
-                  __in                                         BYTE           bContainerIndex,
-                  __in                                         LPCWSTR        wszProperty,
-                  __out_bcount_part_opt(cbData, *pdwDataLen)   PBYTE          pbData,
-                  __in                                         DWORD          cbData,
-                  __out                                        PDWORD         pdwDataLen,
-                  __in                                         DWORD          dwFlags
-               )
+	(
+	__in                                         PCARD_DATA     pCardData,
+	__in                                         BYTE           bContainerIndex,
+	__in                                         LPCWSTR        wszProperty,
+	__out_bcount_part_opt(cbData, *pdwDataLen)   PBYTE          pbData,
+	__in                                         DWORD          cbData,
+	__out                                        PDWORD         pdwDataLen,
+	__in                                         DWORD          dwFlags
+	)
 {
-   DWORD             dwReturn = 0;
-   PCARD_LIST_TYPE   pCurrentCard  = NULL;
-   CONTAINER_INFO    ContInfo;
-   DWORD             cbCertif = 0;
-   DWORD			 dwCertSpec = 0;
-   PBYTE			 pbCertif = NULL;
-   PIN_ID            dwPinId = 0;
-   LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
+	DWORD             dwReturn = 0;
+	CONTAINER_INFO    ContInfo;
+	DWORD             cbCertif = 0;
+	DWORD			 dwCertSpec = 0;
+	PBYTE			 pbCertif = NULL;
+	PIN_ID            dwPinId = 0;
+	LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
 
-   memset(&ContInfo, '\0', sizeof(ContInfo));
+	memset(&ContInfo, '\0', sizeof(ContInfo));
 
-   /********************/
-   /* Check Parameters */
-   /********************/
-   if ( pCardData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pCardData]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( ( bContainerIndex != 0 ) &&
-        ( bContainerIndex != 1 ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [bContainerIndex]");
-      CLEANUP(SCARD_E_NO_KEY_CONTAINER);
-   }
-   if ( wszProperty == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( pbData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pbData]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( pdwDataLen == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pdwDataLen]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	/********************/
+	/* Check Parameters */
+	/********************/
+	if ( pCardData == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pCardData]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( ( bContainerIndex != 0 ) &&
+		( bContainerIndex != 1 ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [bContainerIndex]");
+		CLEANUP(SCARD_E_NO_KEY_CONTAINER);
+	}
+	if ( wszProperty == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( pbData == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pbData]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( pdwDataLen == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pdwDataLen]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( ( wcscmp(wszProperty, CCP_CONTAINER_INFO) != 0 ) &&
-        ( wcscmp(wszProperty, CCP_PIN_IDENTIFIER) != 0 ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( ( wcscmp(wszProperty, CCP_CONTAINER_INFO) != 0 ) &&
+		( wcscmp(wszProperty, CCP_PIN_IDENTIFIER) != 0 ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   pCurrentCard = GetCardListItem(pCardData);
-   if ( pCurrentCard == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Card context and handle not Found...");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
+	if ( wcscmp(wszProperty, CCP_CONTAINER_INFO) == 0 ) 
+	{
+		LogTrace(LOGTYPE_INFO, WHERE, "Property: [CCP_CONTAINER_INFO] for ContainerIndex: [%d]", bContainerIndex);
 
-   if ( wcscmp(wszProperty, CCP_CONTAINER_INFO) == 0 ) 
-   {
-      LogTrace(LOGTYPE_INFO, WHERE, "Property: [CCP_CONTAINER_INFO] for ContainerIndex: [%d]", bContainerIndex);
+		if ( cbData < sizeof(CONTAINER_INFO) )
+		{
+			LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer[%d]<[%d]", cbData, sizeof(CONTAINER_INFO));
+			CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+		}
+		if (bContainerIndex == 0) {
+			LogTrace(LOGTYPE_INFO, WHERE, "Creating Authentication Certif...");
+			dwCertSpec = CERT_AUTH;
+		}
+		if (bContainerIndex == 1) {
+			LogTrace(LOGTYPE_INFO, WHERE, "Creating Non-Repudiation Certif...");
+			dwCertSpec = CERT_NONREP;
+		}
+		dwReturn = BeidReadCert(pCardData, dwCertSpec, &cbCertif, &pbCertif);
+		if ( dwReturn != SCARD_S_SUCCESS )
+		{
+			if (bContainerIndex == 0)
+				LogTrace(LOGTYPE_ERROR, WHERE, "BeidReadCert[CERT_AUTH] returned [%d]", dwReturn);
+			if (bContainerIndex == 1)
+				LogTrace(LOGTYPE_ERROR, WHERE, "BeidReadCert[CERT_NONREP] returned [%d]", dwReturn);
+			CLEANUP(SCARD_E_UNEXPECTED);
+		}
+		ContInfo.dwVersion      = CONTAINER_INFO_CURRENT_VERSION;
+		ContInfo.dwReserved     = 0;
+		dwReturn = BeidGetPubKey(pCardData, 
+			cbCertif, 
+			pbCertif, 
+			&(ContInfo.cbSigPublicKey), 
+			&(ContInfo.pbSigPublicKey));
+		if ( dwReturn != SCARD_S_SUCCESS )
+		{
+			LogTrace(LOGTYPE_ERROR, WHERE, "BeidGetPubKey returned [%d]", dwReturn);
+			CLEANUP(SCARD_E_UNEXPECTED);
+		}
 
-      if ( cbData < sizeof(CONTAINER_INFO) )
-      {
-         LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer[%d]<[%d]", cbData, sizeof(CONTAINER_INFO));
-         CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-      }
-	  if (bContainerIndex == 0) {
-		  LogTrace(LOGTYPE_INFO, WHERE, "Creating Authentication Certif...");
-		  dwCertSpec = CERT_AUTH;
-	  }
-	  if (bContainerIndex == 1) {
-	  	  LogTrace(LOGTYPE_INFO, WHERE, "Creating Non-Repudiation Certif...");
-		  dwCertSpec = CERT_NONREP;
-	  }
-	  dwReturn = BeidReadCert(pCardData, dwCertSpec, &cbCertif, &pbCertif);
-	  if ( dwReturn != SCARD_S_SUCCESS )
-	  {
-		  if (bContainerIndex == 0)
-			  LogTrace(LOGTYPE_ERROR, WHERE, "BeidReadCert[CERT_AUTH] returned [%d]", dwReturn);
-		  if (bContainerIndex == 1)
-			  LogTrace(LOGTYPE_ERROR, WHERE, "BeidReadCert[CERT_NONREP] returned [%d]", dwReturn);
-		  CLEANUP(SCARD_E_UNEXPECTED);
-	  }
-      ContInfo.dwVersion      = CONTAINER_INFO_CURRENT_VERSION;
-      ContInfo.dwReserved     = 0;
-   //   ContInfo.cbSigPublicKey = pCurrentCard->ContainerInfo[bContainerIndex].ContainerInfo.cbSigPublicKey;
-   //   ContInfo.pbSigPublicKey = pCardData->pfnCspAlloc(ContInfo.cbSigPublicKey);
-  	  dwReturn = BeidGetPubKey(pCardData, 
-                            cbCertif, 
-                            pbCertif, 
-                            &(ContInfo.cbSigPublicKey), 
-                            &(ContInfo.pbSigPublicKey));
-	  if ( dwReturn != SCARD_S_SUCCESS )
-	  {
-		  LogTrace(LOGTYPE_ERROR, WHERE, "BeidGetPubKey returned [%d]", dwReturn);
-		  CLEANUP(SCARD_E_UNEXPECTED);
-	  }
+		if ( ContInfo.pbSigPublicKey == NULL )
+		{
+			LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for public key data (pbSigPublicKey)...");
+			CLEANUP(SCARD_E_NO_MEMORY);
+		}
 
-      if ( ContInfo.pbSigPublicKey == NULL )
-      {
-         LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for public key data (pbSigPublicKey)...");
-         CLEANUP(SCARD_E_NO_MEMORY);
-      }
+		memcpy (pbData, &ContInfo, sizeof(CONTAINER_INFO));
 
-//      memcpy (ContInfo.pbSigPublicKey,
-//              pCurrentCard->ContainerInfo[bContainerIndex].ContainerInfo.pbSigPublicKey,
-//              ContInfo.cbSigPublicKey);
+		*pdwDataLen = sizeof(CONTAINER_INFO);
+	}
+	else
+	{
+		LogTrace(LOGTYPE_INFO, WHERE, "Property: [CCP_PIN_IDENTIFIER] for ContainerIndex: [%d]", bContainerIndex);
 
-      memcpy (pbData, &ContInfo, sizeof(CONTAINER_INFO));
+		if ( cbData < sizeof(PIN_ID) )
+		{
+			LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer[%d]<[%d]", cbData, sizeof(PIN_ID));
+			CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+		}
+		if (bContainerIndex == 0) {
+			dwPinId = ROLE_DIGSIG;
+		}
+		if (bContainerIndex == 1) {
+			dwPinId = ROLE_NONREP;
+		}
 
-      *pdwDataLen = sizeof(CONTAINER_INFO);
-   }
-   else
-   {
-      LogTrace(LOGTYPE_INFO, WHERE, "Property: [CCP_PIN_IDENTIFIER] for ContainerIndex: [%d]", bContainerIndex);
-
-      if ( cbData < sizeof(PIN_ID) )
-      {
-         LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer[%d]<[%d]", cbData, sizeof(PIN_ID));
-         CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-      }
-	  if (bContainerIndex == 0) {
-		  dwPinId = ROLE_DIGSIG;
-	  }
-	  if (bContainerIndex == 1) {
-		  dwPinId = ROLE_NONREP;
-	  }
-      
-      memcpy (pbData, &(dwPinId), sizeof(PIN_ID));
-      *pdwDataLen = sizeof(PIN_ID);
-   }
+		memcpy (pbData, &(dwPinId), sizeof(PIN_ID));
+		*pdwDataLen = sizeof(PIN_ID);
+	}
 
 cleanup:
-   LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
-   return(dwReturn);
+	LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
+	return(dwReturn);
 }
 #undef WHERE
 
@@ -190,23 +176,23 @@ cleanup:
 
 #define WHERE "CardSetContainerProperty()"
 DWORD WINAPI   CardSetContainerProperty
-               (
-                  __in                    PCARD_DATA  pCardData,
-                  __in                    BYTE        bContainerIndex,
-                  __in                    LPCWSTR     wszProperty,
-                  __in_bcount(cbDataLen)  PBYTE       pbData,
-                  __in                    DWORD       cbDataLen,
-                  __in                    DWORD       dwFlags
-               )
+	(
+	__in                    PCARD_DATA  pCardData,
+	__in                    BYTE        bContainerIndex,
+	__in                    LPCWSTR     wszProperty,
+	__in_bcount(cbDataLen)  PBYTE       pbData,
+	__in                    DWORD       cbDataLen,
+	__in                    DWORD       dwFlags
+	)
 {
-   DWORD    dwReturn = 0;
-   LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
+	DWORD    dwReturn = 0;
+	LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
 
-   CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
+	CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
 
 cleanup:
-   LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
-   return(dwReturn);
+	LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
+	return(dwReturn);
 }
 #undef WHERE
 
@@ -217,782 +203,816 @@ cleanup:
 //
 
 #define WHERE "CardGetFreeSpace"
-DWORD CardGetFreeSpace(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetFreeSpace(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD                   dwReturn    = 0;
-   CARD_FREE_SPACE_INFO    SpaceInfo;
+	DWORD                   dwReturn    = 0;
+	CARD_FREE_SPACE_INFO    SpaceInfo;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_FREE_SPACE]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_FREE_SPACE]");
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( cbData < sizeof(SpaceInfo) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
-      CLEANUP(SCARD_E_INSUFFICIENT_BUFFER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( cbData < sizeof(SpaceInfo) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
+		CLEANUP(SCARD_E_INSUFFICIENT_BUFFER);
+	}
 
-   SpaceInfo.dwVersion                 = CARD_FREE_SPACE_INFO_CURRENT_VERSION;
-   /* We have a read-only card */
-   SpaceInfo.dwBytesAvailable          = 0;
-   SpaceInfo.dwKeyContainersAvailable  = 0;
-   SpaceInfo.dwMaxKeyContainers        = 2; /* Authentication and Non-repudiation key */
+	SpaceInfo.dwVersion                 = CARD_FREE_SPACE_INFO_CURRENT_VERSION;
+	/* We have a read-only card */
+	SpaceInfo.dwBytesAvailable          = 0;
+	SpaceInfo.dwKeyContainersAvailable  = 0;
+	SpaceInfo.dwMaxKeyContainers        = 2; /* Authentication and Non-repudiation key */
 
-   memcpy (pbData, &SpaceInfo, sizeof(SpaceInfo));
-   *pdwDataLen = sizeof(SpaceInfo);
+	memcpy (pbData, &SpaceInfo, sizeof(SpaceInfo));
+	*pdwDataLen = sizeof(SpaceInfo);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetFreeSpace"
-DWORD CardSetFreeSpace(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetFreeSpace(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_FREE_SPACE]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_FREE_SPACE]");
 
-   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	CLEANUP(SCARD_E_INVALID_PARAMETER);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetCapabilities"
-DWORD CardGetCapabilities(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetCapabilities(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD             dwReturn    = 0;
-   CARD_CAPABILITIES CardCap;
+	DWORD             dwReturn    = 0;
+	CARD_CAPABILITIES CardCap;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_CAPABILITIES]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_CAPABILITIES]");
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( cbData < sizeof(CardCap) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
-      CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-   }
+	if ( cbData < sizeof(CardCap) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
+		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+	}
 
-   CardCap.dwVersion                = CARD_CAPABILITIES_CURRENT_VERSION;
-   CardCap.fCertificateCompression  = TRUE;
-   CardCap.fKeyGen                  = FALSE;
+	CardCap.dwVersion                = CARD_CAPABILITIES_CURRENT_VERSION;
+	CardCap.fCertificateCompression  = TRUE;
+	CardCap.fKeyGen                  = FALSE;
 
-   memcpy (pbData, &CardCap, sizeof(CardCap));
-   *pdwDataLen = sizeof(CardCap);
+	memcpy (pbData, &CardCap, sizeof(CardCap));
+	*pdwDataLen = sizeof(CardCap);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetCapabilities"
-DWORD CardSetCapabilities(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetCapabilities(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_CAPABILITIES]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_CAPABILITIES]");
 
-   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	CLEANUP(SCARD_E_INVALID_PARAMETER);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetKeysizes"
-DWORD CardGetKeysizes(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetKeysizes(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD             dwReturn  = 0;
+	DWORD             dwReturn  = 0;
 
-   CARD_KEY_SIZES    KeySizes;
+	CARD_KEY_SIZES    KeySizes;
 
-   int               iUnSupported = 0;
-   int               iInValid     = 0;
+	int               iUnSupported = 0;
+	int               iInValid     = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_KEYSIZES]");
+	LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_KEYSIZES]");
 
-   switch(dwFlags)
-   {
-   case AT_ECDHE_P256 :
-   case AT_ECDHE_P384 :
-   case AT_ECDHE_P521 :
-   case AT_ECDSA_P256 :
-   case AT_ECDSA_P384 :
-   case AT_ECDSA_P521 :
-      iUnSupported++;
-      break;
-   case AT_KEYEXCHANGE:
-   case AT_SIGNATURE  :
-      break;
-   default:
-      iInValid++;
-      break;
-   }
-   if ( iInValid )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( iUnSupported )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Unsupported parameter [dwFlags]");
-      CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
-   }
+	switch(dwFlags)
+	{
+	case AT_ECDHE_P256 :
+	case AT_ECDHE_P384 :
+	case AT_ECDHE_P521 :
+	case AT_ECDSA_P256 :
+	case AT_ECDSA_P384 :
+	case AT_ECDSA_P521 :
+		iUnSupported++;
+		break;
+	case AT_KEYEXCHANGE:
+	case AT_SIGNATURE  :
+		break;
+	default:
+		iInValid++;
+		break;
+	}
+	if ( iInValid )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( iUnSupported )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Unsupported parameter [dwFlags]");
+		CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
+	}
 
-   KeySizes.dwVersion            = CARD_KEY_SIZES_CURRENT_VERSION;
-   KeySizes.dwMinimumBitlen      = 1024;
-   KeySizes.dwDefaultBitlen      = 1024;
-   KeySizes.dwMaximumBitlen      = 1024;
-   KeySizes.dwIncrementalBitlen  = 0;
+	KeySizes.dwVersion            = CARD_KEY_SIZES_CURRENT_VERSION;
+	KeySizes.dwMinimumBitlen      = 1024;
+	KeySizes.dwDefaultBitlen      = 1024;
+	KeySizes.dwMaximumBitlen      = 1024;
+	KeySizes.dwIncrementalBitlen  = 0;
 
-   memcpy (pbData, &KeySizes, sizeof(KeySizes));
-   *pdwDataLen = sizeof(KeySizes);
+	memcpy (pbData, &KeySizes, sizeof(KeySizes));
+	*pdwDataLen = sizeof(KeySizes);
 
-   CLEANUP(SCARD_S_SUCCESS);
+	CLEANUP(SCARD_S_SUCCESS);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetKeysizes"
-DWORD CardSetKeysizes(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetKeysizes(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_KEYSIZES]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_KEYSIZES]");
 
-   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	CLEANUP(SCARD_E_INVALID_PARAMETER);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetReadOnly"
-DWORD CardGetReadOnly(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetReadOnly(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn    = 0;
-   BOOL     bReadOnly   = TRUE;
+	DWORD    dwReturn    = 0;
+	BOOL     bReadOnly   = TRUE;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_READ_ONLY]");
+	LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_READ_ONLY]");
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( cbData < sizeof(bReadOnly) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
-      CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-   }
+	if ( cbData < sizeof(bReadOnly) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
+		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+	}
 
-   memcpy (pbData, &bReadOnly, sizeof(bReadOnly));
-   *pdwDataLen = sizeof(bReadOnly);
+	memcpy (pbData, &bReadOnly, sizeof(bReadOnly));
+	*pdwDataLen = sizeof(bReadOnly);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetReadOnly"
-DWORD CardSetReadOnly(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetReadOnly(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_READ_ONLY]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_READ_ONLY]");
 
-   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	CLEANUP(SCARD_E_INVALID_PARAMETER);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetCacheMode"
-DWORD CardGetCacheMode(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetCacheMode(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn    = 0;
-   DWORD    dwCacheMode = CP_CACHE_MODE_SESSION_ONLY;// CP_CACHE_MODE_NO_CACHE;
+	DWORD    dwReturn    = 0;
+	DWORD    dwCacheMode = CP_CACHE_MODE_SESSION_ONLY;// CP_CACHE_MODE_NO_CACHE;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_CACHE_MODE]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_CACHE_MODE]");
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( cbData < sizeof(dwCacheMode) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
-      CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-   }
+	if ( cbData < sizeof(dwCacheMode) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
+		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+	}
 
-   memcpy (pbData, &dwCacheMode, sizeof(dwCacheMode));
-   *pdwDataLen = sizeof(dwCacheMode);
+	memcpy (pbData, &dwCacheMode, sizeof(dwCacheMode));
+	*pdwDataLen = sizeof(dwCacheMode);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetCacheMode"
-DWORD CardSetCacheMode(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetCacheMode(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_CACHE_MODE]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_CACHE_MODE]");
 
-   CLEANUP(SCARD_W_SECURITY_VIOLATION);
+	CLEANUP(SCARD_W_SECURITY_VIOLATION);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetSupportsWinX509Enrollment"
-DWORD CardGetSupportsWinX509Enrollment(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetSupportsWinX509Enrollment(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
-   BOOL     bSupportEnroll = FALSE;
+	DWORD    dwReturn       = 0;
+	BOOL     bSupportEnroll = FALSE;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_SUPPORTS_WIN_X509_ENROLLMENT]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_SUPPORTS_WIN_X509_ENROLLMENT]");
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( cbData < sizeof(bSupportEnroll) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
-      CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-   }
+	if ( cbData < sizeof(bSupportEnroll) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
+		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+	}
 
-   memcpy (pbData, &bSupportEnroll, sizeof(bSupportEnroll));
-   *pdwDataLen = sizeof(bSupportEnroll);
+	memcpy (pbData, &bSupportEnroll, sizeof(bSupportEnroll));
+	*pdwDataLen = sizeof(bSupportEnroll);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetSupportsWinX509Enrollment"
-DWORD CardSetSupportsWinX509Enrollment(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetSupportsWinX509Enrollment(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_SUPPORTS_WIN_X509_ENROLLMENT]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_SUPPORTS_WIN_X509_ENROLLMENT]");
 
-   CLEANUP(SCARD_W_SECURITY_VIOLATION);
+	CLEANUP(SCARD_W_SECURITY_VIOLATION);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetGuid"
-DWORD CardGetGuid(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetGuid(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD                   dwReturn         = 0;
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_GUID]");
+	DWORD                   dwReturn         = 0;
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_GUID]");
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( cbData < sizeof(GUID) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer [%d][%d]", cbData, sizeof(GUID));
-      CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( cbData < sizeof(GUID) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer [%d][%d]", cbData, sizeof(GUID));
+		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+	}
 
-   dwReturn = CardGetProperty(pCardData, 
-			   CP_CARD_SERIAL_NO, 
-			   pbData, 
-			   cbData,
-			   pdwDataLen,
-			   0);
-   if (dwReturn != SCARD_S_SUCCESS)  
-   {
-	   LogTrace(LOGTYPE_ERROR, WHERE, "Error CardGetProperty for [CP_CARD_SERIAL_NO]: 0x08X", dwReturn);
-	   CLEANUP(dwReturn);
-   }
-	
-   LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pCardData->pvVendorSpecific);
+	dwReturn = CardGetProperty(pCardData, 
+		CP_CARD_SERIAL_NO, 
+		pbData, 
+		cbData,
+		pdwDataLen,
+		0);
+	if (dwReturn != SCARD_S_SUCCESS)  
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Error CardGetProperty for [CP_CARD_SERIAL_NO]: 0x08X", dwReturn);
+		CLEANUP(dwReturn);
+	}
+
+	LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pCardData->pvVendorSpecific);
 
 cleanup:
 
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetGuid"
-DWORD CardSetGuid(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetGuid(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_GUID]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_GUID]");
 
-   CLEANUP(SCARD_W_SECURITY_VIOLATION);
+	CLEANUP(SCARD_W_SECURITY_VIOLATION);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetSerialNo"
-DWORD CardGetSerialNo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetSerialNo(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn    = 0;
+	DWORD    dwReturn    = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_SERIAL_NO]");
-   if (cbData < 16) 
-   {
-	   CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-   }
-   // For further reference
-   // we keep the serial number in pCardData->pvVendorSpecific
-   if (pCardData->pvVendorSpecific == NULL) 
-   {
-	   // serial number not set
-       pCardData->pvVendorSpecific = pCardData->pfnCspAlloc(16);
-	   if ( pCardData->pvVendorSpecific == NULL )
-	   {
-          LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pCardData->pvVendorSpecific][GUID]");
-          CLEANUP(SCARD_E_NO_MEMORY);
-       }
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_SERIAL_NO]");
+	if (cbData < 16) 
+	{
+		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+	}
+	// For further reference
+	// we keep the serial number in pCardData->pvVendorSpecific
+	if (pCardData->pvVendorSpecific == NULL) 
+	{
+		// serial number not set
+		pCardData->pvVendorSpecific = pCardData->pfnCspAlloc(16);
+		if ( pCardData->pvVendorSpecific == NULL )
+		{
+			LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pCardData->pvVendorSpecific][GUID]");
+			CLEANUP(SCARD_E_NO_MEMORY);
+		}
 
-	   dwReturn = BeidGetCardSN(pCardData, pCardData->pvVendorSpecific, 16, pdwDataLen);
-	   if ( dwReturn != SCARD_S_SUCCESS )
-       {
+		dwReturn = BeidGetCardSN(pCardData, pCardData->pvVendorSpecific, 16, pdwDataLen);
+		if ( dwReturn != SCARD_S_SUCCESS )
+		{
 			LogTrace(LOGTYPE_ERROR, WHERE, "BeidGetCardSN returned [%d]", dwReturn);
 			CLEANUP(SCARD_E_UNEXPECTED);
-	   }	   
-   }
-   else 
-   {
-	   *pdwDataLen = 16;
-   }
+		}	   
+	}
+	else 
+	{
+		*pdwDataLen = 16;
+	}
 
-   LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pCardData->pvVendorSpecific);
-   memcpy (pbData, pCardData->pvVendorSpecific, 16);
+	LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pCardData->pvVendorSpecific);
+	memcpy (pbData, pCardData->pvVendorSpecific, 16);
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetSerialNo"
-DWORD CardSetSerialNo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetSerialNo(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_SERIAL_NO]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_SERIAL_NO]");
 
-   CLEANUP(SCARD_W_SECURITY_VIOLATION);
+	CLEANUP(SCARD_W_SECURITY_VIOLATION);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinInfo"
-DWORD CardGetPinInfo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinInfo(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD             dwReturn    = 0;
+	DWORD             dwReturn    = 0;
+	PIN_INFO			 pinInfo;
+	FEATURES			 CCIDfeatures;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_PIN_INFO][%d]", dwFlags);
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_PIN_INFO][%d]", dwFlags);
 
-   /* dwFlags contains the the identifier of the PIN to return */
-   if ( (dwFlags < 0        ) ||
-        (dwFlags > MAX_PINS ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags = %d]", dwFlags);
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	/* dwFlags contains the the identifier of the PIN to return */
+	if ( (dwFlags < 0        ) ||
+		(dwFlags > MAX_PINS ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags = %d]", dwFlags);
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( ( dwFlags != ROLE_DIGSIG ) &&
-        ( dwFlags != ROLE_NONREP ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags][%d]", dwFlags);
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( ( dwFlags != ROLE_DIGSIG ) &&
+		( dwFlags != ROLE_NONREP ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags][%d]", dwFlags);
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( cbData < sizeof(PIN_INFO) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer [%d][%d]", cbData, sizeof(PIN_INFO));
-      CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-   }
+	if ( cbData < sizeof(PIN_INFO) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer [%d][%d]", cbData, sizeof(PIN_INFO));
+		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+	}
 
-   memcpy (pbData, &pCurrentCard->PinInfo[dwFlags], sizeof(PIN_INFO));
-   *pdwDataLen = sizeof(PIN_INFO);
+	/**********************************************
+	*  Pin info
+	**********************************************/ 
+	pinInfo.dwVersion                             = PIN_INFO_CURRENT_VERSION;
+	pinInfo.dwChangePermission                    = CREATE_PIN_SET(dwFlags);
+	pinInfo.dwUnblockPermission                   = 0;
+	pinInfo.dwFlags                               = 0;
+	pinInfo.PinPurpose                            = AuthenticationPin;
+	if (dwFlags == ROLE_DIGSIG)
+		pinInfo.PinPurpose                        = AuthenticationPin;
+	if (dwFlags == ROLE_NONREP) 
+		pinInfo.PinPurpose                        = NonRepudiationPin;
+	/**********************************************
+	*  Pin chache policy
+	**********************************************/   
+	pinInfo.PinCachePolicy.dwVersion              = PIN_CACHE_POLICY_CURRENT_VERSION;
+	pinInfo.PinCachePolicy.dwPinCachePolicyInfo   = 0;
+	pinInfo.PinCachePolicy.PinCachePolicyType     = PinCacheNone;
+	if (dwFlags == ROLE_DIGSIG) 
+		pinInfo.PinCachePolicy.PinCachePolicyType = PinCacheNormal;
+	if (dwFlags == ROLE_NONREP) 
+		pinInfo.PinCachePolicy.PinCachePolicyType = PinCacheNone;
+
+	/*********************************************
+	*  Check CCID features for external pin pad
+	**********************************************/
+	CCIDgetFeatures(&(CCIDfeatures), pCardData->hScard);
+	if (CCIDfeatures.VERIFY_PIN_START != 0)
+		pinInfo.PinType                           = ExternalPinType;
+	else
+		pinInfo.PinType                           = AlphaNumericPinType;
+
+	memcpy (pbData, &pinInfo, sizeof(PIN_INFO));
+	*pdwDataLen = sizeof(PIN_INFO);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinInfo"
-DWORD CardSetPinInfo(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinInfo(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_PIN_INFO]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_PIN_INFO]");
 
-   CLEANUP(SCARD_W_SECURITY_VIOLATION);
+	CLEANUP(SCARD_W_SECURITY_VIOLATION);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetListPins"
-DWORD CardGetListPins(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetListPins(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn    = 0;
-   DWORD    dwPinSet    = 0;
+	DWORD    dwReturn    = 0;
+	DWORD    dwPinSet    = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_LIST_PINS]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_LIST_PINS]");
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( cbData < sizeof(dwPinSet) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
-      CLEANUP(ERROR_INSUFFICIENT_BUFFER);
-   }
+	if ( cbData < sizeof(dwPinSet) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Insufficient buffer");
+		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
+	}
 
-   /* We only have a normal user */
-   dwPinSet = CREATE_PIN_SET(ROLE_DIGSIG);
-   SET_PIN(dwPinSet, ROLE_NONREP);
+	/* We only have a normal user */
+	dwPinSet = CREATE_PIN_SET(ROLE_DIGSIG);
+	SET_PIN(dwPinSet, ROLE_NONREP);
 
-   LogTrace(LOGTYPE_INFO, WHERE, "PINSET:[%d]", dwPinSet);
-   memcpy (pbData, &dwPinSet, sizeof(dwPinSet));
-   *pdwDataLen = sizeof(dwPinSet);
+	LogTrace(LOGTYPE_INFO, WHERE, "PINSET:[%d]", dwPinSet);
+	memcpy (pbData, &dwPinSet, sizeof(dwPinSet));
+	*pdwDataLen = sizeof(dwPinSet);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetListPins"
-DWORD CardSetListPins(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetListPins(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_LIST_PINS]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_LIST_PINS]");
 
-   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	CLEANUP(SCARD_E_INVALID_PARAMETER);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetAuthenticatedState"
-DWORD CardGetAuthenticatedState(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetAuthenticatedState(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_AUTHENTICATED_STATE]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_AUTHENTICATED_STATE]");
 
-   /*
-    * certification changed on 23/07/2008
+	/*
+	* certification changed on 23/07/2008
 	* Must return SCARD_E_INVALID_PARAMETER instead of SCARD_E_UNSUPPORTED_FEATURE
 	*/
-   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	CLEANUP(SCARD_E_INVALID_PARAMETER);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetAuthenticatedState"
-DWORD CardSetAuthenticatedState(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetAuthenticatedState(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_AUTHENTICATED_STATE]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_AUTHENTICATED_STATE]");
 
-   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	CLEANUP(SCARD_E_INVALID_PARAMETER);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinStrengthVerify"
-DWORD CardGetPinStrengthVerify(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinStrengthVerify(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn      = 0;
-   DWORD    dwPinStrength = CARD_PIN_STRENGTH_PLAINTEXT;
+	DWORD    dwReturn      = 0;
+	DWORD    dwPinStrength = CARD_PIN_STRENGTH_PLAINTEXT;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_PIN_STRENGTH_VERIFY]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_PIN_STRENGTH_VERIFY]");
 
-   if ( ( dwFlags < 0         ) ||
-        ( dwFlags >= MAX_PINS ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags][%d]", dwFlags);
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( ( dwFlags < 0         ) ||
+		( dwFlags >= MAX_PINS ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags][%d]", dwFlags);
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( ( dwFlags != ROLE_DIGSIG ) &&
-        ( dwFlags != ROLE_NONREP ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags][%d]", dwFlags);
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( ( dwFlags != ROLE_DIGSIG ) &&
+		( dwFlags != ROLE_NONREP ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags][%d]", dwFlags);
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   if ( pCurrentCard->PinInfo[dwFlags].dwVersion != PIN_INFO_CURRENT_VERSION )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "PIN identifier [%d] not supported by card", dwFlags);
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	//if ( pCurrentCard->PinInfo[dwFlags].dwVersion != PIN_INFO_CURRENT_VERSION )
+	//{
+	//   LogTrace(LOGTYPE_ERROR, WHERE, "PIN identifier [%d] not supported by card", dwFlags);
+	//   CLEANUP(SCARD_E_INVALID_PARAMETER);
+	//}
 
-   memcpy (pbData, &dwPinStrength, sizeof(dwPinStrength));
-   *pdwDataLen = sizeof(dwPinStrength);
+	memcpy (pbData, &dwPinStrength, sizeof(dwPinStrength));
+	*pdwDataLen = sizeof(dwPinStrength);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinStrengthVerify"
-DWORD CardSetPinStrengthVerify(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinStrengthVerify(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_PIN_STRENGTH_VERIFY]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_PIN_STRENGTH_VERIFY]");
 
-   CLEANUP(SCARD_W_SECURITY_VIOLATION);
+	CLEANUP(SCARD_W_SECURITY_VIOLATION);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinStrengthChange"
-DWORD CardGetPinStrengthChange(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinStrengthChange(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_PIN_STRENGTH_CHANGE]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_PIN_STRENGTH_CHANGE]");
 
-   CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
+	CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinStrengthChange"
-DWORD CardSetPinStrengthChange(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinStrengthChange(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD dwReturn = 0;
+	DWORD dwReturn = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_PIN_STRENGTH_CHANGE]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_PIN_STRENGTH_CHANGE]");
 
-   CLEANUP(SCARD_W_SECURITY_VIOLATION);
+	CLEANUP(SCARD_W_SECURITY_VIOLATION);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinStrengthUnblock"
-DWORD CardGetPinStrengthUnblock(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinStrengthUnblock(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_PIN_STRENGTH_UNBLOCK]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_PIN_STRENGTH_UNBLOCK]");
 
-   CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
+	CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinStrengthUnblock"
-DWORD CardSetPinStrengthUnblock(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinStrengthUnblock(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD dwReturn = 0;
+	DWORD dwReturn = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_PIN_STRENGTH_UNBLOCK]");
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_CARD_PIN_STRENGTH_UNBLOCK]");
 
-   CLEANUP(SCARD_W_SECURITY_VIOLATION);
+	CLEANUP(SCARD_W_SECURITY_VIOLATION);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetParentWindow"
-DWORD CardGetParentWindow(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetParentWindow(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_PARENT_WINDOW]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_PARENT_WINDOW]");
 
-   CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
+	CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetParentWindow"
-DWORD CardSetParentWindow(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetParentWindow(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD dwReturn   = 0;
-   HWND  hWinHandle = 0;
+	DWORD dwReturn   = 0;
+	HWND  hWinHandle = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_PARENT_WINDOW][0x%X]", dwFlags);
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_PARENT_WINDOW][0x%X]", dwFlags);
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( pbData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pbData]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( cbData != sizeof(HWND) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [cbData]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( pbData == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pbData]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( cbData != sizeof(HWND) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [cbData]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   memcpy(&hWinHandle, pbData, sizeof(HWND));
-   if ( ( hWinHandle           != 0 ) &&
-        ( IsWindow(hWinHandle) == 0 ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid Window Handle [0x%X][0x%X]", hWinHandle, GetLastError());
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   LogTrace(LOGTYPE_INFO, WHERE, "Valid Window Handle [0x%X]", hWinHandle);
+	memcpy(&hWinHandle, pbData, sizeof(HWND));
+	if ( ( hWinHandle           != 0 ) &&
+		( IsWindow(hWinHandle) == 0 ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid Window Handle [0x%X][0x%X]", hWinHandle, GetLastError());
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	LogTrace(LOGTYPE_INFO, WHERE, "Valid Window Handle [0x%X]", hWinHandle);
 
-   CLEANUP(SCARD_S_SUCCESS);
+	CLEANUP(SCARD_S_SUCCESS);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetPinContextString"
-DWORD CardGetPinContextString(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
+DWORD CardGetPinContextString(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
-   DWORD    dwReturn       = 0;
+	DWORD    dwReturn       = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_PIN_CONTEXT_STRING]");
+	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_PIN_CONTEXT_STRING]");
 
-   CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
+	CLEANUP(SCARD_E_UNSUPPORTED_FEATURE);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
 /****************************************************************************************************/
 
 #define WHERE "CardSetPinContextString"
-DWORD CardSetPinContextString(PCARD_DATA pCardData, PCARD_LIST_TYPE pCurrentCard, PBYTE pbData, DWORD cbData, DWORD dwFlags)
+DWORD CardSetPinContextString(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, DWORD dwFlags)
 {
-   DWORD dwReturn = 0;
+	DWORD dwReturn = 0;
 
-   LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_PIN_CONTEXT_STRING][0x%X]", dwFlags);
+	LogTrace(LOGTYPE_INFO, WHERE, "SET Property: [CP_PIN_CONTEXT_STRING][0x%X]", dwFlags);
 
-   if ( dwFlags != 0 )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   CLEANUP(SCARD_S_SUCCESS);
+	CLEANUP(SCARD_S_SUCCESS);
 
 cleanup:
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
@@ -1000,112 +1020,101 @@ cleanup:
 
 typedef struct CardPropertyFnct
 {
-   LPWSTR   wszProperty;
-   DWORD    (*GetFnct)(PCARD_DATA, PCARD_LIST_TYPE, PBYTE, DWORD, PDWORD, DWORD);
-   DWORD    (*SetFnct)(PCARD_DATA, PCARD_LIST_TYPE, PBYTE, DWORD, DWORD);
+	LPWSTR   wszProperty;
+	DWORD    (*GetFnct)(PCARD_DATA, PBYTE, DWORD, PDWORD, DWORD);
+	DWORD    (*SetFnct)(PCARD_DATA, PBYTE, DWORD, DWORD);
 } CardPropertyFnct;
 
 CardPropertyFnct PropFnct [] = 
 {
-   {CP_CARD_FREE_SPACE             , CardGetFreeSpace                , CardSetFreeSpace                },
-   {CP_CARD_CAPABILITIES           , CardGetCapabilities             , CardSetCapabilities             },
-   {CP_CARD_KEYSIZES               , CardGetKeysizes                 , CardSetKeysizes                 },
-   {CP_CARD_READ_ONLY              , CardGetReadOnly                 , CardSetReadOnly                 },
-   {CP_CARD_CACHE_MODE             , CardGetCacheMode                , CardSetCacheMode                },
-   {CP_SUPPORTS_WIN_X509_ENROLLMENT, CardGetSupportsWinX509Enrollment, CardSetSupportsWinX509Enrollment},
-   {CP_CARD_GUID                   , CardGetGuid                     , CardSetGuid                     },
-   {CP_CARD_SERIAL_NO              , CardGetSerialNo                 , CardSetSerialNo                 },
-   {CP_CARD_PIN_INFO               , CardGetPinInfo                  , CardSetPinInfo                  },
-   {CP_CARD_LIST_PINS              , CardGetListPins                 , CardSetListPins                 },
-   {CP_CARD_AUTHENTICATED_STATE    , CardGetAuthenticatedState       , CardSetAuthenticatedState       },
-   {CP_CARD_PIN_STRENGTH_VERIFY    , CardGetPinStrengthVerify        , CardSetPinStrengthVerify        },
-   {CP_CARD_PIN_STRENGTH_CHANGE    , CardGetPinStrengthChange        , CardSetPinStrengthChange        },
-   {CP_CARD_PIN_STRENGTH_UNBLOCK   , CardGetPinStrengthUnblock       , CardSetPinStrengthUnblock       },
-   {CP_PARENT_WINDOW               , CardGetParentWindow             , CardSetParentWindow             },
-   {CP_PIN_CONTEXT_STRING          , CardGetPinContextString         , CardSetPinContextString         },
-   {NULL, NULL, NULL}
+	{CP_CARD_FREE_SPACE             , CardGetFreeSpace                , CardSetFreeSpace                },
+	{CP_CARD_CAPABILITIES           , CardGetCapabilities             , CardSetCapabilities             },
+	{CP_CARD_KEYSIZES               , CardGetKeysizes                 , CardSetKeysizes                 },
+	{CP_CARD_READ_ONLY              , CardGetReadOnly                 , CardSetReadOnly                 },
+	{CP_CARD_CACHE_MODE             , CardGetCacheMode                , CardSetCacheMode                },
+	{CP_SUPPORTS_WIN_X509_ENROLLMENT, CardGetSupportsWinX509Enrollment, CardSetSupportsWinX509Enrollment},
+	{CP_CARD_GUID                   , CardGetGuid                     , CardSetGuid                     },
+	{CP_CARD_SERIAL_NO              , CardGetSerialNo                 , CardSetSerialNo                 },
+	{CP_CARD_PIN_INFO               , CardGetPinInfo                  , CardSetPinInfo                  },
+	{CP_CARD_LIST_PINS              , CardGetListPins                 , CardSetListPins                 },
+	{CP_CARD_AUTHENTICATED_STATE    , CardGetAuthenticatedState       , CardSetAuthenticatedState       },
+	{CP_CARD_PIN_STRENGTH_VERIFY    , CardGetPinStrengthVerify        , CardSetPinStrengthVerify        },
+	{CP_CARD_PIN_STRENGTH_CHANGE    , CardGetPinStrengthChange        , CardSetPinStrengthChange        },
+	{CP_CARD_PIN_STRENGTH_UNBLOCK   , CardGetPinStrengthUnblock       , CardSetPinStrengthUnblock       },
+	{CP_PARENT_WINDOW               , CardGetParentWindow             , CardSetParentWindow             },
+	{CP_PIN_CONTEXT_STRING          , CardGetPinContextString         , CardSetPinContextString         },
+	{NULL, NULL, NULL}
 };
 
 /****************************************************************************************************/
 
 #define WHERE "CardGetProperty()"
 DWORD WINAPI   CardGetProperty
-(
-   __in                                         PCARD_DATA  pCardData,
-   __in                                         LPCWSTR     wszProperty,
-   __out_bcount_part_opt(cbData, *pdwDataLen)   PBYTE       pbData,
-   __in                                         DWORD       cbData,
-   __out                                        PDWORD      pdwDataLen,
-   __in                                         DWORD       dwFlags
-)
+	(
+	__in                                         PCARD_DATA  pCardData,
+	__in                                         LPCWSTR     wszProperty,
+	__out_bcount_part_opt(cbData, *pdwDataLen)   PBYTE       pbData,
+	__in                                         DWORD       cbData,
+	__out                                        PDWORD      pdwDataLen,
+	__in                                         DWORD       dwFlags
+	)
 {
-   DWORD             dwReturn       = 0;
-   int               i              = 0;
+	DWORD             dwReturn       = 0;
+	int               i              = 0;
 
-   PCARD_LIST_TYPE   pCurrentCard   = NULL;
-   
-   LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
 
-   /********************/
-   /* Check Parameters */
-   /********************/
-   if ( pCardData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pCardData]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( wszProperty == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( pbData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pbData]");
-	  printf("brrr\n");
-	  printf("brrr\n");
-	  printf("brrr\n");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( pdwDataLen == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pdwDataLen]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
 
-   pCurrentCard = GetCardListItem(pCardData);
-   if ( pCurrentCard == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Card context and handle not Found...");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
+	/********************/
+	/* Check Parameters */
+	/********************/
+	if ( pCardData == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pCardData]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( wszProperty == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( pbData == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pbData]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( pdwDataLen == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pdwDataLen]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   while ( ( PropFnct[i].wszProperty != NULL ) &&
-           ( PropFnct[i].GetFnct     != NULL ) )
-   {
-      if ( wcscmp(wszProperty, PropFnct[i].wszProperty) == 0 ) 
-      {
-         dwReturn = (*PropFnct[i].GetFnct)(pCardData, pCurrentCard, pbData, cbData, pdwDataLen, dwFlags);
-         break;
-      }
-      i++;
-   }
-   if ( ( PropFnct[i].wszProperty == NULL ) ||
-        ( PropFnct[i].GetFnct     == NULL ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty not supported]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	while ( ( PropFnct[i].wszProperty != NULL ) &&
+		( PropFnct[i].GetFnct     != NULL ) )
+	{
+		if ( wcscmp(wszProperty, PropFnct[i].wszProperty) == 0 ) 
+		{
+			dwReturn = (*PropFnct[i].GetFnct)(pCardData, pbData, cbData, pdwDataLen, dwFlags);
+			break;
+		}
+		i++;
+	}
+	if ( ( PropFnct[i].wszProperty == NULL ) ||
+		( PropFnct[i].GetFnct     == NULL ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty not supported]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
 #ifdef _DEBUG
-   LogDump (cbData, (char *)pbData);
+	LogDump (cbData, (char *)pbData);
 #endif
 
 cleanup:
 
-   LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
+	LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
 
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 
@@ -1117,68 +1126,59 @@ cleanup:
 
 #define WHERE "CardSetProperty()"
 DWORD WINAPI   CardSetProperty
-               (
-                  __in                    PCARD_DATA     pCardData,
-                  __in                    LPCWSTR        wszProperty,
-                  __in_bcount(cbDataLen)  PBYTE          pbData,
-                  __in                    DWORD          cbDataLen,
-                  __in                    DWORD          dwFlags
-               )
+	(
+	__in                    PCARD_DATA     pCardData,
+	__in                    LPCWSTR        wszProperty,
+	__in_bcount(cbDataLen)  PBYTE          pbData,
+	__in                    DWORD          cbDataLen,
+	__in                    DWORD          dwFlags
+	)
 {
-   DWORD             dwReturn       = 0;
-   int               i              = 0;
+	DWORD             dwReturn       = 0;
+	int               i              = 0;
 
-   PCARD_LIST_TYPE   pCurrentCard   = NULL;
+	LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
 
-   LogTrace(LOGTYPE_INFO, WHERE, "Enter API...");
+	/********************/
+	/* Check Parameters */
+	/********************/
+	if ( pCardData == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pCardData]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
+	if ( wszProperty == NULL )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
-   /********************/
-   /* Check Parameters */
-   /********************/
-   if ( pCardData == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [pCardData]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-   if ( wszProperty == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
-
-   pCurrentCard = GetCardListItem(pCardData);
-   if ( pCurrentCard == NULL )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Card context and handle not Found...");
-      CLEANUP(SCARD_E_UNEXPECTED);
-   }
-
-   while ( ( PropFnct[i].wszProperty != NULL ) &&
-           ( PropFnct[i].SetFnct     != NULL ) )
-   {
-      if ( wcscmp(wszProperty, PropFnct[i].wszProperty) == 0 ) 
-      {
-         dwReturn = (*PropFnct[i].SetFnct)(pCardData, pCurrentCard, pbData, cbDataLen, dwFlags);
-         break;
-      }
-      i++;
-   }
-   if ( ( PropFnct[i].wszProperty == NULL ) ||
-        ( PropFnct[i].SetFnct     == NULL ) )
-   {
-      LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty not supported]");
-      CLEANUP(SCARD_E_INVALID_PARAMETER);
-   }
+	while ( ( PropFnct[i].wszProperty != NULL ) &&
+		( PropFnct[i].SetFnct     != NULL ) )
+	{
+		if ( wcscmp(wszProperty, PropFnct[i].wszProperty) == 0 ) 
+		{
+			dwReturn = (*PropFnct[i].SetFnct)(pCardData, pbData, cbDataLen, dwFlags);
+			break;
+		}
+		i++;
+	}
+	if ( ( PropFnct[i].wszProperty == NULL ) ||
+		( PropFnct[i].SetFnct     == NULL ) )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [wszProperty not supported]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 
 #ifdef _DEBUG
-   LogDump (cbDataLen, (char *)pbData);
+	LogDump (cbDataLen, (char *)pbData);
 #endif
 
 cleanup:
 
-   LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
+	LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
 
-   return(dwReturn);
+	return(dwReturn);
 }
 #undef WHERE
 

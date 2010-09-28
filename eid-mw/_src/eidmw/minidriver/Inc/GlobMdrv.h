@@ -23,10 +23,7 @@
 #include <cardmod.h>
 #include <stdio.h>
 
-//#include "Log.h"
-//#include "util.h"
 #include "stdafx.h"
-#include "ListMgr.h"
 
 #define CLEANUP(i)                        {dwReturn=(i);goto cleanup;}
 
@@ -70,39 +67,39 @@ typedef struct _VFO_CONTAINER_INFO
 
 /************************************************************************************************************************/
 
-typedef struct _OBJECT_LIST_TYPE
-{
-   item_type                     item_link_type;
-
-   BYTE                          szDirectoryName [8 + 1];
-   BYTE                          szFileName      [8 + 1];
-   BYTE                          bObjectType;
-   BYTE                          bAccessCondition;
-   LPVOID                        pObjectData;
-   DWORD                         ObjectDataSize;
-} OBJECT_LIST_TYPE, *POBJECT_LIST_TYPE;
-
-typedef struct _CARD_LIST_TYPE
-{
-   item_type               item_link_type;
-
-   SCARDHANDLE             hScard;
-
-   VFO_CONTAINER_INFO      ContainerInfo[MAX_CONTAINERS];
-   PIN_INFO                PinInfo      [MAX_PINS];
-
-   head_type               ObjectList;
-} CARD_LIST_TYPE, *PCARD_LIST_TYPE;
-
-typedef struct _CONTEXT_LIST_TYPE
-{
-   item_type               item_link_type;
-
-   SCARDCONTEXT            hSCardCtx;
-
-   head_type               CardList;
-
-} CONTEXT_LIST_TYPE, *PCONTEXT_LIST_TYPE;
+//typedef struct _OBJECT_LIST_TYPE
+//{
+//   item_type                     item_link_type;
+//
+//   BYTE                          szDirectoryName [8 + 1];
+//   BYTE                          szFileName      [8 + 1];
+//   BYTE                          bObjectType;
+//   BYTE                          bAccessCondition;
+//   LPVOID                        pObjectData;
+//   DWORD                         ObjectDataSize;
+//} OBJECT_LIST_TYPE, *POBJECT_LIST_TYPE;
+//
+//typedef struct _CARD_LIST_TYPE
+//{
+//   item_type               item_link_type;
+//
+//   SCARDHANDLE             hScard;
+//
+//   VFO_CONTAINER_INFO      ContainerInfo[MAX_CONTAINERS];
+//   PIN_INFO                PinInfo      [MAX_PINS];
+//
+//   head_type               ObjectList;
+//} CARD_LIST_TYPE, *PCARD_LIST_TYPE;
+//
+//typedef struct _CONTEXT_LIST_TYPE
+//{
+//   item_type               item_link_type;
+//
+//   SCARDCONTEXT            hSCardCtx;
+//
+//   head_type               CardList;
+//
+//} CONTEXT_LIST_TYPE, *PCONTEXT_LIST_TYPE;
 
 /************************************************************************************************************************/
 
