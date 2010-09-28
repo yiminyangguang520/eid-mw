@@ -576,6 +576,12 @@ DWORD CardGetSerialNo(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD p
 	DWORD    dwReturn    = 0;
 
 	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_SERIAL_NO]");
+
+	if ( dwFlags != 0 )
+	{
+		LogTrace(LOGTYPE_ERROR, WHERE, "Invalid parameter [dwFlags]");
+		CLEANUP(SCARD_E_INVALID_PARAMETER);
+	}
 	if (cbData < 16) 
 	{
 		CLEANUP(ERROR_INSUFFICIENT_BUFFER);
