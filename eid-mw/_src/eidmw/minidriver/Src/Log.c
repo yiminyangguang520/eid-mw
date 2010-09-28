@@ -32,7 +32,7 @@
 
 #define MAX_LOG_FILE_NAME	512
 #define MAX_LOG_DIR_NAME	480
-char    g_szLogFile[MAX_LOG_FILE_NAME]  = "C:\\SmartCardMinidriverTest\\AZEBEIDMDRV.LOG";
+char    g_szLogFile[MAX_LOG_FILE_NAME]  = "C:\\SmartCardMinidriverLog\\AZEBEIDMDRV.LOG";
 
 #ifdef _DEBUG
 unsigned int   g_uiLogLevel      = LOGTYPE_TRACE;
@@ -75,15 +75,15 @@ void LogInit()
 		// error   -> LOGTYPE_ERROR
 		// none    -> LOGTYPE_NONE
 
-		if (lstrcmp((LPTSTR)lpData,TEXT("debug")))
+		if (!lstrcmp((LPTSTR)lpData,TEXT("debug")))
 			g_uiLogLevel = LOGTYPE_TRACE;
-		else if (lstrcmp((LPTSTR)lpData,TEXT("info")))
+		else if (!lstrcmp((LPTSTR)lpData,TEXT("info")))
 			g_uiLogLevel = LOGTYPE_INFO;
-		else if (lstrcmp((LPTSTR)lpData,TEXT("warning")))
+		else if (!lstrcmp((LPTSTR)lpData,TEXT("warning")))
 			g_uiLogLevel = LOGTYPE_WARNING;
-		else if (lstrcmp((LPTSTR)lpData,TEXT("error")))
+		else if (!lstrcmp((LPTSTR)lpData,TEXT("error")))
 			g_uiLogLevel = LOGTYPE_ERROR;
-		else if (lstrcmp((LPTSTR)lpData,TEXT("none")))
+		else if (!lstrcmp((LPTSTR)lpData,TEXT("none")))
 			g_uiLogLevel = LOGTYPE_NONE;
 	}
 
@@ -126,6 +126,8 @@ g_uiLogLevel = uiLogLevel;
 void LogTrace(int info, const char *pWhere, const char *format,... )
 {
 	char           buffer[2048];
+	BYTE baseName[512];
+	DWORD baseNamseSize; 
 
 	time_t         timer;
 	struct tm      *t;
@@ -179,6 +181,13 @@ void LogTrace(int info, const char *pWhere, const char *format,... )
 		return;
 	}
 
+	/* get the name of the file that started this process*/
+	baseNamseSize = GetModuleFileName(NULL,(LPTSTR)baseName,512);
+	if (baseNamseSize == 0)
+		lstrcpy(baseName,TEXT("Unknown name"));
+	//baseNamseSize = GetModuleBaseName(GetCurrentProcess(),NULL,(LPTSTR)baseName,512);
+	//baseNamseSize = GetProcessImageFileName(NULL,(LPTSTR)baseName,512);
+
 	/* Gets time of day */
 	timer = time(NULL);
 
@@ -211,7 +220,7 @@ void LogTrace(int info, const char *pWhere, const char *format,... )
 	fp = fopen(g_szLogFile, "a");
 	if ( fp != NULL )
 	{
-		fprintf (fp, "%s|%30s|%s\n", timebuf, pWhere, buffer);
+		fprintf (fp, "%s %d %d %s|%30s|%s\n",baseName, GetCurrentProcessId(), GetCurrentThreadId(), timebuf, pWhere, buffer);
 		fclose(fp);
 	}
 }
