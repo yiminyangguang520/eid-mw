@@ -636,10 +636,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Src\ListMgr.c"
-				>
-			</File>
-			<File
 				RelativePath="Src\Log.c"
 				>
 				<FileConfiguration
