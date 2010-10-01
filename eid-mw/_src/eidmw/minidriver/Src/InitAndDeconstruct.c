@@ -27,7 +27,7 @@
 /****************************************************************************************************/
 
 #define MINIMUM_VERSION_SUPPORTED      CARD_DATA_VERSION_SIX
-#define CURRENT_VERSION_SUPPORTED      CARD_DATA_VERSION_SIX
+#define CURRENT_VERSION_SUPPORTED      CARD_DATA_VERSION_SEVEN
 
 #define SUPPORTED_CARDS                3
 
@@ -215,6 +215,9 @@ DWORD WINAPI   CardAcquireContext
 	/* Not defined */
 	pCardData->pfnCspGetDHAgreement           = NULL;
 
+	/* Vendor specific */
+	pCardData->pvVendorSpecific               = pCardData->pfnCspAlloc(sizeof(VENDOR_SPECIFIC));
+	memset(pCardData->pvVendorSpecific, 0, sizeof(VENDOR_SPECIFIC));
 cleanup:
 
 	LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");
@@ -253,6 +256,7 @@ DWORD WINAPI   CardDeleteContext
 	LogTrace(LOGTYPE_INFO, WHERE, "Context:[0x%08X]", pCardData->hSCardCtx);
 
 	pCardData->pfnCspFree(pCardData->pvVendorSpecific);
+	pCardData->pvVendorSpecific = NULL;
 cleanup:
 
 	LogTrace(LOGTYPE_INFO, WHERE, "Exit API...");

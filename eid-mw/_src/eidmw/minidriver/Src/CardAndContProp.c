@@ -574,7 +574,7 @@ cleanup:
 DWORD CardGetSerialNo(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD pdwDataLen, DWORD dwFlags)
 {
 	DWORD    dwReturn    = 0;
-
+	VENDOR_SPECIFIC * vs;
 	LogTrace(LOGTYPE_INFO, WHERE, "GET Property: [CP_CARD_SERIAL_NO]");
 
 	if ( dwFlags != 0 )
@@ -588,30 +588,26 @@ DWORD CardGetSerialNo(PCARD_DATA pCardData, PBYTE pbData, DWORD cbData, PDWORD p
 	}
 	// For further reference
 	// we keep the serial number in pCardData->pvVendorSpecific
-	if (pCardData->pvVendorSpecific == NULL) 
+	vs = (VENDOR_SPECIFIC*)pCardData->pvVendorSpecific;
+	if (vs->bSerialNumberSet == 0) 
 	{
 		// serial number not set
-		pCardData->pvVendorSpecific = pCardData->pfnCspAlloc(16);
-		if ( pCardData->pvVendorSpecific == NULL )
-		{
-			LogTrace(LOGTYPE_ERROR, WHERE, "Error allocating memory for [pCardData->pvVendorSpecific][GUID]");
-			CLEANUP(SCARD_E_NO_MEMORY);
-		}
-
-		dwReturn = BeidGetCardSN(pCardData, pCardData->pvVendorSpecific, 16, pdwDataLen);
+		dwReturn = BeidGetCardSN(pCardData, vs->szSerialNumber, 
+			sizeof(vs->szSerialNumber), pdwDataLen);
 		if ( dwReturn != SCARD_S_SUCCESS )
 		{
 			LogTrace(LOGTYPE_ERROR, WHERE, "BeidGetCardSN returned [%d]", dwReturn);
 			CLEANUP(SCARD_E_UNEXPECTED);
-		}	   
+		}
+		vs->bSerialNumberSet = 1;
 	}
 	else 
 	{
-		*pdwDataLen = 16;
+		*pdwDataLen = sizeof(vs->szSerialNumber);
 	}
 
-	LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_GUID] -> [%d]", pCardData->pvVendorSpecific);
-	memcpy (pbData, pCardData->pvVendorSpecific, 16);
+	LogTrace(LOGTYPE_INFO, WHERE, "Property: [CP_CARD_SERIAL_NO] -> [%d]", pCardData->pvVendorSpecific);
+	memcpy (pbData, vs->szSerialNumber, sizeof(vs->szSerialNumber));
 cleanup:
 	return(dwReturn);
 }
