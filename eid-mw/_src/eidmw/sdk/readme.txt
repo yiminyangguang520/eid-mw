@@ -14,13 +14,15 @@ Contents
 - Logging
 - Known issues
 
+Platform Requirements
+======================
+The Sdk only contains 32bit libraries and examples:
 
 Platform Requirements
 ======================
 The Sdk is tested on one of the following platforms:
-- Windows: XP SP3, Vista
-- Linux: fedora 9, OpenSuse 11, Debian etch on i386
-- Mac: OSX 10.4 (Tiger) PPC and Intel, 10.5 (Leopard) PPC and Intel
+- Windows: XP SP3, Vista, 7
+- Mac: OSX 10.5 (Leopard), 10.6 (SnowLeopard)
 
 Software requirements
 =====================
