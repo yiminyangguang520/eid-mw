@@ -1,5 +1,8 @@
 //*****************************************************************************
 // eID SDK sample code.
+// Please not that from eidmw 3.5.4 onwards, the CSP is not installed
+// on OS's beyond Windows XP (e.g. Vista, 7)
+// Instead, the minidriver is installed
 //*****************************************************************************
 #include <iostream>
 #include <windows.h>
