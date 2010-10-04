@@ -15,7 +15,11 @@
 
 
 #ifdef WIN32
-#define FILE_TO_SIGN "sign_p11.exe"
+ #ifdef _DEBUG
+  #define FILE_TO_SIGN "bin/debug/sign_p11.exe"
+ #else
+  #define FILE_TO_SIGN "sign_p11.exe"
+ #endif
 typedef CK_RV (*P11_GetFunctionList)(CK_FUNCTION_LIST_PTR_PTR ppFunctionList);
 #else
 #define FILE_TO_SIGN "sign_p11"
