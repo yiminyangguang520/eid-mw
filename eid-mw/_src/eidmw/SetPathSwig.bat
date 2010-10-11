@@ -8,14 +8,14 @@
 @if "%FILE_NOT_FOUND%"=="" goto find_swig 
 @echo        Not found in "%BEID_DIR_SWIG%"
 
-@set BEID_DIR_SWIG=%~dp0..\ThirdParty\swigwin-1.3.35
+@set BEID_DIR_SWIG=%~dp0..\ThirdParty\swigwin-2.0.0
 @set FILE_NOT_FOUND=
 @for %%i in (%FILE_TO_FIND%) do @if not exist "%BEID_DIR_SWIG%\%%~i" set FILE_NOT_FOUND=%%~i
 @if "%FILE_NOT_FOUND%"=="" goto find_swig 
 @echo        Not found in "%BEID_DIR_SWIG%"
 
 @echo [ERROR] Swig could not be found
-@echo         If the path is different from "%~dp0..\ThirdParty\swigwin-1.3.35"
+@echo         If the path is different from "%~dp0..\ThirdParty\swigwin-2.0.0"
 @echo         please define BEID_DIR_SWIG environment variable.
 @exit /B 1
 
