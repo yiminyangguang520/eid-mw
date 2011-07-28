@@ -1,6 +1,7 @@
 #!/bin/sh
 DIRNAME=`dirname $0`
 
+#echo the script's pid
 echo $$
 
 IFS=$'\n' ver=($(sw_vers -productVersion))
