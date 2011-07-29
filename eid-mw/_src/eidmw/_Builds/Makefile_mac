@@ -444,6 +444,7 @@ rel_end:
 	@echo "rm -R /Applications/BelgiumIdentityCard/BEID_Lion.tokend;" >> $(POSTFLIGHT)
 	@echo "mv $(APPS_DIR)/$(EIDGUI).app $(APPS_DIR)/$(EIDGUI_NAME).app" >> $(POSTFLIGHT)
 	@echo "mv $(APPS_DIR) \"$(APPS_DIR_NAME)\"" >> $(POSTFLIGHT)
+	@echo "test -e /Library/LaunchDaemons/org.opensc.pcscd.autostart && mv /Library/LaunchDaemons/org.opensc.pcscd.autostart /Library/LaunchDaemons/org.opensc.pcscd.autostart.plist;" >> $(POSTFLIGHT)
 	@echo "sudo /usr/bin/security add-trusted-cert -d -r trustRoot -k /Library/KeyChains/System.keychain $(ROOT_DIR)/$(INST_DIR)/share/beid/certs/beid-cert-belgiumrca2.der" >> $(POSTFLIGHT)
 
 	-@test -e tmp && rm temp
