@@ -4711,19 +4711,19 @@ void MainWnd::refreshTabForeignersExtra( void )
 	int FieldCnt = Remarks.size();
 	if (FieldCnt>0)
 	{
-		m_ui.txtForeignersExtra_Remarks1->setText(Remarks[idx++]);
+		m_ui.txtForeignersExtra_Remarks1->setText(Remarks[idx]);
 		m_ui.txtForeignersExtra_Remarks1->setAccessibleName(Remarks[idx++]);
 		FieldCnt--;
 	}
 	if (FieldCnt>0)
 	{
-		m_ui.txtForeignersExtra_Remarks2->setText(Remarks[idx++]);
+		m_ui.txtForeignersExtra_Remarks2->setText(Remarks[idx]);
 		m_ui.txtForeignersExtra_Remarks2->setAccessibleName(Remarks[idx++]);
 		FieldCnt--;
 	}
 	if (FieldCnt>0)
 	{
-		m_ui.txtForeignersExtra_Remarks3->setText(Remarks[idx++]);
+		m_ui.txtForeignersExtra_Remarks3->setText(Remarks[idx]);
 		m_ui.txtForeignersExtra_Remarks3->setAccessibleName(Remarks[idx++]);
 		FieldCnt--;
 	}
