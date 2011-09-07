@@ -1066,7 +1066,7 @@ void detectReaderThread::run() {
 		counter++;
 	}
 #endif		
-			
+		
     while (listItem.isNull()) {
 #ifdef __APPLE__
 		if (CSysDiagnost::getOSXVersion() < 7)
@@ -1075,6 +1075,9 @@ void detectReaderThread::run() {
 		}
 		else 
 		{
+			//stall the scardestablishcontext function, as it hangs when pcscd switches bitness (32/64), 
+			//better would be to return to the press button solution, but 4.0 QI will make this obsolete
+			msleep(4000);
 #endif
 			readersXml = scl.pcscEnumerateCardReaders("");
 #ifdef __APPLE__
