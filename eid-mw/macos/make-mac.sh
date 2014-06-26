@@ -64,31 +64,6 @@ else
 fi
 
 #########################################
-# check xerces installed 
-#########################################
-XERCESCLIB=libxerces-c-3.1.dylib
-XERCESCPATH=../_src/ThirdParty/Xerces/Xerces-3.1.0-mac
-echo "[Info ] Verifying xerces libraries..."
-if [ ! -e $XERCESCPATH/lib/$XERCESCLIB ]
-then
-	echo "[Error] xerces library not found at $XERCESCPATH/lib. Please verify or install."
-	exit -1
-else
-	echo "[Info ] Installed"
-fi
-
-echo "[Info ] Verifying xerces include..."
-XERCESCINC=SAXParser.hpp
-if [ ! -e $XERCESCPATH/include/xercesc/parsers/$XERCESCINC ]
-then
-	echo "[Error] xerces include file not found at $XERCESPATH//include/xercesc/parsers/. Please verify or install."
-	exit -1
-else
-	echo "[Info ] Installed"
-fi
-
-
-#########################################
 # check Qt4 installed
 #########################################
 
