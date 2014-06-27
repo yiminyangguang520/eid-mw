@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # java 1.4.2 is not supported any more since oct 2008
 MINJAVAVER=1.5
 MACHINETYPE=i386
