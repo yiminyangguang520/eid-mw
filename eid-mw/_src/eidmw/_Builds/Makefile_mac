@@ -41,10 +41,10 @@
 # to the pkg.
 # The environment variable is used to indicate which Qt libraries have to be taken.
 ifdef QTBASEDIR
-        QTFRAMEWORKSDIR:=$(QTBASEDIR)/lib/
-	QTPLUGINDIR=$(QTBASEDIR)/plugins
+        QTFRAMEWORKSDIR?=$(QTBASEDIR)/lib/
+	QTPLUGINDIR?=$(QTBASEDIR)/plugins
 else
-        QTFRAMEWORKSDIR=/Library/Frameworks/
+        QTFRAMEWORKSDIR?=/Library/Frameworks/
 	QTPLUGINDIR=/Developer/Applications/Qt/plugins/
 endif
 QT4VERSION=$(shell otool -L $(QTFRAMEWORKSDIR)/QtCore.framework/QtCore)
