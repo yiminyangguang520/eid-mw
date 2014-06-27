@@ -87,7 +87,7 @@ else
 	#-----------------------------------------
 	QT4=`which qmake`
 	THEPATH=${QT4%/*}
-	QT4VERSION=`${THEPATH}/moc -v 2>&1`
+	QT4VERSION=`${THEPATH}/moc -v 2>&1 || true`
 	VERSIONSTR=`expr ${QT4VERSION} : '.*\([1-9]\.[0-9]\.[0-9]\)'`
 
 	if [[ "${VERSIONSTR}" = "${MINQT4VER}" ]]
