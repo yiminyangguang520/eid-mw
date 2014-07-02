@@ -1,1 +1,2 @@
+#!/bin/sh
 qmake -spec macx-xcode eID-EZinstaller.pro
