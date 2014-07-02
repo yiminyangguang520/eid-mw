@@ -8,15 +8,7 @@ PROCESSOR = $(shell uname -p)
 all: postflight PKG_NAME
 
 postflight: postflight.c
-ifeq ($(PROCESSOR), powerpc)
-	$(CC) -arch ppc postflight.c -o postflight
-	@echo "******************************************************"
-	@echo "WARNING: postflight is no universal binary!!"
-	@echo "so don't build the universal binary on this machine!!!"
-	@echo "******************************************************"
-else
-	$(CC) -arch ppc -arch i386 postflight.c -o postflight
-endif
+	$(CC) -arch x86_64 -arch i386 postflight.c -o postflight
 
 PKG_NAME:
 	cp postflight resources/
