@@ -239,7 +239,7 @@ cd -
 # The makefile requires
 #-----------------------------------------
 cd ../_src/eidmw/_Builds
-sudo make -f Makefile_mac release QTBASEDIR=$QTBASEDIR UNIVERSAL=${UNIVERSAL}
+sudo make -f Makefile_mac release QTBASEDIR=$QTBASEDIR UNIVERSAL=${UNIVERSAL} QTFRAMEWORKSDIR=$QTFRAMEWORKSDIR QTPLUGINDIR=$QTPLUGINDIR
 cd -
 
 #-----------------------------------------
