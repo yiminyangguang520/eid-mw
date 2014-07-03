@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cd $(dirname $0) 
+
+for i in *.ui
+do
+	uic -o GeneratedFiles/ui_${i%ui}h $i
+done

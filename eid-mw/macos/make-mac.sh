@@ -173,6 +173,7 @@ cd -
 
 if [[ "${UNIVERSAL}" == "true" ]]
 then
+	../_src/eID-QuickInstaller/eID-EZinstaller/build_ui_files
 	cd ../_src/eidmw/_Builds
 #	xcodebuild -configuration Release
 	xcodebuild -project beidmw.xcodeproj clean
