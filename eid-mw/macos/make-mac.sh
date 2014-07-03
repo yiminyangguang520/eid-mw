@@ -262,7 +262,7 @@ sudo cp -r /release_build/beid.pkg .
 sudo mv beid.pkg beid-$BUILDNR.pkg
 
 #Detach and delete old dmg
-hdiutil detach /Volumes/beid-$MWVER
+hdiutil detach /Volumes/beid-$MWVER || true
 
 if [ -e beid-$MWVER-$BUILDNR-uncompressed.dmg ]
 then
