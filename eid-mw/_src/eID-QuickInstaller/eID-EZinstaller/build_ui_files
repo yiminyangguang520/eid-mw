@@ -6,3 +6,13 @@ for i in *.ui
 do
 	uic -o GeneratedFiles/ui_${i%ui}h $i
 done
+for i in MAC/*qrc
+do
+	file=$(basename $i)
+	rcc -o GeneratedFiles/qrc_${file%qrc}cpp $i
+done
+
+for i in confirmdialogbox ezinstaller
+do
+	moc -o GeneratedFiles/moc_${i}.cpp ${i}.h
+done
