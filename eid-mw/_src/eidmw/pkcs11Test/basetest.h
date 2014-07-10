@@ -1,7 +1,7 @@
 /* ****************************************************************************
 
  * eID Middleware Project.
- * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2009-2012 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -38,9 +38,9 @@
 #define dlsym(h, function) GetProcAddress(h, function)
 #define dlclose(h) FreeLibrary(h)
 #ifdef WIN64
-#define PKCS11_LIB "..\\_Binaries35\\x64\\Debug\\beid35pkcs11D.dll"
+#define PKCS11_LIB L"beidpkcs11.dll" //"..\\..\\VS_2012\\Binaries\\x64_Release\\beidpkcs11.dll"
 #else
-#define PKCS11_LIB "..\\_Binaries35\\Debug\\beid35pkcs11D.dll"
+#define PKCS11_LIB "beidpkcs11.dll"//"F:\\trunk\\VS_2010\\Binaries\\Win32_Debug\\beidpkcs11D.dll"//L"beid_ff_pkcs11.dll"//
 #endif
 #define RTLD_LAZY	1
 #define RTLD_NOW	2
@@ -58,11 +58,34 @@
 #endif
 #include <stdlib.h>
 
+typedef enum{
+	TEST_PASSED = 0,
+	TEST_SKIPPED,
+	TEST_WARNING,
+	TEST_ERROR,
+	TEST_FAILED
+}BASETEST_RV;
+
+typedef struct{
+	CK_RV pkcs11rv;
+	BASETEST_RV basetestrv;
+} testRet;
+
 /****************************************************************************
  * Base Test Functions prototypes
  ***************************************************************************/
 int GetPKCS11FunctionList(CK_FUNCTION_LIST_PTR *pFunctions,void *handle);
 CK_BBOOL ReturnedSuccesfull(CK_RV frv, CK_RV *ptrv, char* pkcs11function, char* test_name );
+CK_BBOOL ReturnedSucces(CK_RV frv, CK_RV *ptrv, char* pkcs11function);
+
+//fills in the c_functionlist and gives back a handle to the pkcs11 library
 CK_BBOOL InitializeTest(void **phandle,CK_FUNCTION_LIST_PTR *pfunctions);
 
+//fills in the c_functionlist and gives back a handle to the pkcs11 library
+//uses the pkcs11 library to retrieve the slotlist and slotcount
+testRet PrepareSlotListTest(void **phandle,CK_FUNCTION_LIST_PTR *pfunctions, CK_SLOT_ID_PTR* pslotIds, CK_ULONG_PTR pulCount,CK_BBOOL tokenPresent );
+void EndSlotListTest(void *handle, CK_SLOT_ID_PTR slotIds );
+
+//function to print the slotdescription of a certain slot, specified by its slotId
+testRet bt_logslotdescription(CK_FUNCTION_LIST_PTR *pfunctions, CK_ULONG slotId);
 #endif

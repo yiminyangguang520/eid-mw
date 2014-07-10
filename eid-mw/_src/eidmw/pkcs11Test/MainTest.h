@@ -1,7 +1,7 @@
 /* ****************************************************************************
 
  * eID Middleware Project.
- * Copyright (C) 2009-2010 FedICT.
+ * Copyright (C) 2009-2013 FedICT.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License version
@@ -22,13 +22,38 @@
 /****************************************************************************
  * Test Functions prototypes
  ***************************************************************************/
-CK_RV test_finalize_initialize();
-CK_RV test_open_close_session();
-CK_RV test_getmechanisms();
-CK_RV test_getprivatekeys();
-CK_RV test_sign();
-CK_RV test_verify_signature();
-CK_RV test_getallobjects();
-CK_RV test_add_remove_readers();
-CK_RV test_add_remove_readerevents();
+testRet test_finalize_initialize(void);
+testRet test_finalize_initialize_st(void); 
+testRet test_initialize_ownmutex(void);
+testRet test_initialize_preserved(void); 
+testRet test_finalize_preserved(void); 
+testRet test_getinfo(void);
+testRet test_getslotlist(void);
+testRet test_getslotlist_multiple_slots(void);
+testRet test_open_close_session(void);
+testRet test_open_close_session_info(void);
+testRet test_open_close_session_bad_params(void); 
+testRet test_open_close_session_limits(void); 
+testRet test_waitforslotevent(CK_FLAGS flags);
+testRet test_waitforslotevent_nonblocking(void);
+testRet test_waitforslotevent_blocking(void);
+testRet test_waitforslotevent_userinteraction(void);
+testRet test_waitforslotevent_whilefinalize(void);
+testRet test_get_token_info(void); 
+testRet test_getmechanisms(void);
+testRet test_getkeys(void);
+testRet test_sign(void);
+testRet test_verify_signature(void);
+testRet test_getallobjects(void);
+testRet test_getallidobjects(void);
+testRet test_getattributevalue_all(void);
+testRet test_getattributevalue_lastname(void);
+testRet test_getattributevalue_rrn(void);
+testRet test_getkeys_retvals(void);
+testRet test_findPrivateKeyWithoutLoginShouldFail(void);
+testRet test_findObjectsFinalNotInitialized(void); 
+testRet test_add_remove_readers(void);
+testRet test_add_remove_readerevents(void);
+testRet test_sign_allmechs(void);
+testRet test_logslotevents_blocking(void);
 
