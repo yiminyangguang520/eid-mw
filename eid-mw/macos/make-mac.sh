@@ -221,9 +221,6 @@ fi
 mv ./BEID_Lion.tokend ../bin
 cd -
 
-sudo mkdir /release_build
-sudo chmod go+rx /release_build
-
 #-----------------------------------------
 # create the OOoRegister
 #-----------------------------------------
@@ -245,6 +242,8 @@ cd -
 cd ../_src/eidmw/_Builds
 sudo make -f Makefile_mac release QTBASEDIR=$QTBASEDIR UNIVERSAL=${UNIVERSAL} QTFRAMEWORKSDIR=$QTFRAMEWORKSDIR QTPLUGINDIR=$QTPLUGINDIR
 cd -
+
+sudo chmod -R go+rx /release_build
 
 #-----------------------------------------
 # build the Quickinstaller in release mode
