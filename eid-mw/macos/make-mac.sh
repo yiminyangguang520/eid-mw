@@ -221,6 +221,9 @@ fi
 mv ./BEID_Lion.tokend ../bin
 cd -
 
+sudo mkdir /release_build
+sudo chmod go+rx /release_build
+
 #-----------------------------------------
 # create the OOoRegister
 #-----------------------------------------
