@@ -39,6 +39,7 @@ testRet test_waitforslotevent_nonblocking(void);
 testRet test_waitforslotevent_blocking(void);
 testRet test_waitforslotevent_userinteraction(void);
 testRet test_waitforslotevent_whilefinalize(void);
+testRet test_autoread5cards(void);
 testRet test_get_token_info(void); 
 testRet test_getmechanisms(void);
 testRet test_getkeys(void);

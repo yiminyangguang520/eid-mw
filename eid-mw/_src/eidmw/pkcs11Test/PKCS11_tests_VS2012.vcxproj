@@ -187,6 +187,7 @@
     <ClCompile Include="logtest.c" />
     <ClCompile Include="MainTest.c" />
     <ClCompile Include="open-close-session.c" />
+    <ClCompile Include="readmultiplecards.c" />
     <ClCompile Include="sign.c" />
     <ClCompile Include="waitforslotevent.c" />
   </ItemGroup>
