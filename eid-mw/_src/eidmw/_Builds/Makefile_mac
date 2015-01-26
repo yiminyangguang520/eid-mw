@@ -474,6 +474,7 @@ rel_end:
 	@echo "sudo mv \"$(BELGIUM_DIR_NAME)/$(PLISTMERGER_DIR)/Info_org.plist\" \"$(BELGIUM_DIR_NAME)/$(PLISTMERGER_DIR)/Info_old.plist\";" >> $(POSTFLIGHT)
 	@echo "sudo rm \"$(BELGIUM_DIR_NAME)/$(PLISTMERGER_DIR)/Info_org.plist\";" >> $(POSTFLIGHT)
 	@echo "sudo cp /usr/libexec/SmartCardServices/drivers/ifd-ccid.bundle/Contents/Info.plist \"$(BELGIUM_DIR_NAME)/$(PLISTMERGER_DIR)/Info_org.plist\";" >> $(POSTFLIGHT)
+	@echo 'sudo python $$1/Contents/Resources/enablesecd.py' >> $(POSTFLIGHT)
 	@echo "cd \"$(BELGIUM_DIR_NAME)/$(PLISTMERGER_DIR)/\"" >> $(POSTFLIGHT)
 	@echo "sudo ./$(PLISTMERGER_APP)" >> $(POSTFLIGHT)
 	@echo "cd -" >> $(POSTFLIGHT)
