@@ -8,7 +8,7 @@ if '10.10' in mac_version:
  securityd_plist_file = "/System/Library/LaunchDaemons/com.apple.securityd.plist"
  plist = plistlib.Plist.fromFile(securityd_plist_file)
 
- if '-off' in plist.ProgramArguments:
-  print ("-off found")
+ if 'off' in plist.ProgramArguments:
+  print ("off found")
   plist.ProgramArguments = ['/usr/sbin/securityd', '-i']
   plist.write(securityd_plist_file)
